@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -46,5 +47,8 @@ public class Incident {
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private List<IncidentPhoto> photos;
+    private List<IncidentVote> votes;
 
 }

@@ -20,9 +20,9 @@ public class IncidentPhoto {
 
     @ManyToOne
     @JoinColumn(name = "incident_id")
-    private Incident incidentId;
+    private Incident incident;
 
-    private String url;
+    private String photoUrl;
     private LocalDateTime uploadedAt;
 
 
