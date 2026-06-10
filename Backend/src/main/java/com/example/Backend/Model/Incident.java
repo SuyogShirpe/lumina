@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -48,7 +49,16 @@ public class Incident {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    private List<IncidentPhoto> photos;
-    private List<IncidentVote> votes;
+    @Builder.Default
+    @OneToMany(
+            mappedBy = "incident",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<IncidentPhoto> photos = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "incident")
+    private List<IncidentVote> votes = new ArrayList<>();
 
 }
