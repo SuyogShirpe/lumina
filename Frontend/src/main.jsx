@@ -8,6 +8,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { AuthProvider } from "./components/AuthProvider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
