@@ -4,13 +4,15 @@ import com.example.Backend.Model.Role;
 import com.example.Backend.Model.User;
 import com.example.Backend.dto.AuthResponseDto;
 import com.example.Backend.dto.UserDto;
+import com.example.Backend.exception.BadCredentialsException;
+import com.example.Backend.exception.GoogleAuthException;
 import com.example.Backend.mapper.UserMapper;
 import com.example.Backend.repo.UserRepo;
 import com.example.Backend.security.JwtUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
+
 
 import org.springframework.stereotype.Service;
 
@@ -33,12 +35,21 @@ public class GoogleAuthService {
     @Autowired
     private UserMapper userMapper;
 
-    public AuthResponseDto authenticateWithGoogle(String idTokenString) throws GeneralSecurityException, IOException {
-        GoogleIdToken idToken = verifier.verify(idTokenString);
+    public AuthResponseDto authenticateWithGoogle(String idTokenString){
 
-        if(idToken == null){
-            throw new BadCredentialsException("Invalid google Id token");
+
+        GoogleIdToken idToken;
+
+        try {
+            idToken = verifier.verify(idTokenString);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new GoogleAuthException("Failed to verify Google token", e);
         }
+
+        if (idToken == null) {
+            throw new BadCredentialsException("Invalid or expired Google ID token");
+        }
+
         GoogleIdToken.Payload payload = idToken.getPayload();
 
         String googleId = payload.getSubject();
@@ -48,7 +59,7 @@ public class GoogleAuthService {
 
         User user = userRepo
                 .findByGoogleId(googleId)
-                .orElseGet(()->{
+                .orElseGet(() -> {
                     User newUser = User.builder()
                             .googleId(googleId)
                             .email(email)
@@ -65,7 +76,8 @@ public class GoogleAuthService {
 
         UserDto userDto = userMapper.toDto(user);
 
-
         return new AuthResponseDto(jwt, userDto);
+
+
     }
 }
