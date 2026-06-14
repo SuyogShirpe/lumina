@@ -21,5 +21,5 @@ createRoot(document.getElementById("root")).render(
         </AuthProvider>
       </GoogleOAuthProvider>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );
