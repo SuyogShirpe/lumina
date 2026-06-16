@@ -34,4 +34,15 @@ public class GlobalExceptionHandler{
                         "timestamp", LocalDateTime.now()
                 ));
     }
+
+    @ExceptionHandler(IncidentNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleIncidentNotFoundException(GoogleAuthException ex) {
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of(
+                        "error", "Incident not found",
+                        "message", ex.getMessage(),
+                        "timestamp", LocalDateTime.now()
+                ));
+    }
 }

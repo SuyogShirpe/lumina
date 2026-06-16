@@ -4,6 +4,7 @@ import com.example.Backend.Model.Incident;
 import com.example.Backend.Model.IncidentCategory;
 import com.example.Backend.dto.IncidentCategoryDto;
 import com.example.Backend.dto.IncidentDto;
+import com.example.Backend.exception.IncidentNotFoundException;
 import com.example.Backend.mapper.IncidentCategoryMapper;
 import com.example.Backend.mapper.IncidentMapper;
 import com.example.Backend.repo.IncidentCategoryRepo;
@@ -64,8 +65,8 @@ public class IncidentService {
 
 
     public IncidentDto getIncidentById(Long id){
-        Optional<Incident> incident = incidentRepo.findById(id)
-                .orElseThrow(() -> new IncidentNotFoundException("Incident not found out with id: " +id));
+        Optional<Incident> incident = Optional.of(incidentRepo.findById(id)
+                .orElseThrow(() -> new IncidentNotFoundException("Incident not found out with id: " + id)));
 
         IncidentDto dto = incidentMapper.toDto(incident, null);
 
