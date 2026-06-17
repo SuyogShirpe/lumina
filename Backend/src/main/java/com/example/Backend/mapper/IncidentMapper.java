@@ -18,7 +18,7 @@ public interface IncidentMapper {
     @Mapping(source = "user", target = "reporter")
     @Mapping(source = "photos", target = "photoUrls")
     @Mapping(target = "distanceKm", ignore = true)
-    IncidentDto toDto(Incident incident,  @Context Double distanceKm);
+    IncidentDto toDto(Incident incident, @Context Double distanceKm);
 
     @Mapping(target = "incidentId", ignore = true)
     @Mapping(target = "user", ignore = true)
@@ -33,7 +33,9 @@ public interface IncidentMapper {
     @AfterMapping
     default void setDistance(@MappingTarget IncidentDto incidentDto,
                              @Context Double distanceKm){
-        incidentDto.setDistanceKm(distanceKm);
+        if(distanceKm != null){
+            incidentDto.setDistanceKm(distanceKm);
+        }
     }
 
     default List<String> photoToUrls(List<IncidentPhoto> photos){

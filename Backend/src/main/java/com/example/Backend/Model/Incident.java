@@ -58,7 +58,9 @@ public class Incident {
     private List<IncidentPhoto> photos = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "incident")
+    @OneToMany(mappedBy = "incident",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true)
     private List<IncidentVote> votes = new ArrayList<>();
 
 }

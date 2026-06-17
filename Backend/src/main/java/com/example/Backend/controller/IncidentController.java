@@ -16,11 +16,7 @@ public class IncidentController {
     @Autowired
     private IncidentService incidentService;
 
-    public IncidentController(IncidentService incidentService) {
-        this.incidentService = incidentService;
-    }
-
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<IncidentDto>> getNearbyIncidents(@RequestParam double lat,@RequestParam double lng,@RequestParam(defaultValue = "5.0") double radiusKm){
         List<IncidentDto> incidents = incidentService.getNearbyIncidents(lat, lng, radiusKm);
 
