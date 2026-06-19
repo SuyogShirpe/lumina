@@ -1,6 +1,6 @@
-package com.example.Backend.security;
+package com.example.Backend.service;
 
-import com.google.api.client.util.Value;
+import org.springframework.beans.factory.annotation.Value;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
