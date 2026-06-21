@@ -1,5 +1,6 @@
 package com.example.Backend.service;
 
+import com.example.Backend.exception.InvalidFileTypeException;
 import org.springframework.beans.factory.annotation.Value;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class FileStorageService {
             throw new IllegalArgumentException("File is empty");
         }
         if(file.getContentType() == null || !file.getContentType().startsWith("image/")){
-            throw new IllegalArgumentException("Only image files are allowed");
+            throw new InvalidFileTypeException("Only image files are allowed");
         }
 
         String originalFileName = file.getOriginalFilename();

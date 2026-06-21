@@ -3,6 +3,7 @@ package com.example.Backend.service;
 import com.example.Backend.Model.Incident;
 import com.example.Backend.Model.IncidentPhoto;
 import com.example.Backend.exception.IncidentNotFoundException;
+import com.example.Backend.exception.PhotoLimitExceededException;
 import com.example.Backend.repo.IncidentPhotoRepo;
 import com.example.Backend.repo.IncidentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class IncidentPhotoService {
         int photosCount = incidentPhotoRepo.findByIncident_IncidentId(incidentId).size();
 
         if((photosCount + files.size()) > 3){
-            throw new IllegalArgumentException("Maximum 3 photos per incident");
+            throw new PhotoLimitExceededException("Maximum 3 photos per incident");
         }
 
         List<String> photoUrls = new ArrayList<>();
