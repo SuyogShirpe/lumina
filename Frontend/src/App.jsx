@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import UserProfile from "./components/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import MapPage from "./components/MapPage";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
 
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<div>Map coming soon...</div>} />
+        <Route path="/" element={<MapPage />} />
         <Route path="/profile" element={<UserProfile />} />
       </Route>
 

@@ -1,6 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "leaflet/dist/leaflet.css";
 import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
 import App from "./App.jsx";
