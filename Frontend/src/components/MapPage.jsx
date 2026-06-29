@@ -1,6 +1,8 @@
 import { OlaMaps } from "olamaps-web-sdk";
 import { useEffect, useRef, useState } from "react";
 import api from "../api/axiosInstance";
+import { buildIncidentPopup } from "../utils/buildIncidentPopup";
+import "../stylesheets/mapPage.css";
 
 const apikey = import.meta.env.VITE_OLA_MAPS_API_KEY;
 
@@ -33,8 +35,6 @@ const createUserLocationElement = () => {
 };
 
 export default function MapPage() {
-
-  
   const mapRef = useRef(null);
   const markerRef = useRef([]);
   const olaMapsRef = useRef(null);
@@ -59,6 +59,45 @@ export default function MapPage() {
   };
 
   useEffect(() => {
+    const handlePopupClick = async (event) => {
+      const { action, incidentId } = event.target.dataset;
+
+      if (!action || !incidentId) return;
+
+      if (action === "vote") {
+        try {
+          const response = await api.put(`/api/incidents/${incidentId}/vote`);
+          const updatedIncident = response.data;
+
+          setIncidents((prev) =>
+            prev.map((incident) =>
+              incident.incidentId === updatedIncident.incidentId
+                ? {
+                    ...incident,
+                    upvoteCount: updatedIncident.upvoteCount,
+                    userHasVoted: updatedIncident.userHasVoted,
+                  }
+                : incident,
+            ),
+          );
+        } catch (error) {
+          console.error("Failed to vote:", error);
+        }
+      }
+
+      if (action === "details") {
+        window.location.href = `/incidents/${incidentId}`;
+      }
+    };
+
+    document.addEventListener("click", handlePopupClick);
+
+    return () => {
+      document.removeEventListener("click", handlePopupClick);
+    };
+  }, [setIncidents]);
+
+  useEffect(() => {
     let map;
 
     const initMap = async () => {
@@ -79,13 +118,11 @@ export default function MapPage() {
 
         map.on("load", () => {
           setIsMapLoaded(true);
-          console.log("Ola Maps loaded successfully");
 
           navigator.geolocation.getCurrentPosition(
             (position) => {
               const { latitude, longitude } = position.coords;
 
-              console.log("User Location:", latitude, longitude);
               map.flyTo({
                 center: [longitude, latitude],
                 zoom: 14,
@@ -128,22 +165,10 @@ export default function MapPage() {
     markerRef.current = [];
 
     incidents.forEach((incident) => {
-      const popup = new OlaMaps.Popup({ offset: [0, -10], anchor: "bottom" })
-        .setHTML(`
-                    <div style="min-width:160px;padding:6px;">
-                        <div style="font-weight:500;font-size:14px;margin-bottom:4px;">
-                            ${incident.title}
-                        </div>
-                        <div style="font-size:12px;color:#666;margin-bottom:4px;">
-                            ${incident.category?.name || "Unknown"}
-                        </div>
-                        <div style="font-size:11px;color:#999;">
-                            📍 ${incident.distanceKm?.toFixed(2)} km away
-                            &nbsp;·&nbsp;
-                            👍 ${incident.upvoteCount}
-                        </div>
-                    </div>
-                `);
+      const popup = new OlaMaps.Popup({
+        offset: [0, -10],
+        anchor: "bottom",
+      }).setHTML(buildIncidentPopup(incident));
 
       const marker = new OlaMaps.Marker({
         element: createColoredMarkerElement(

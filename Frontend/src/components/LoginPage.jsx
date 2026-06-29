@@ -19,16 +19,12 @@ export default function LoginPage() {
       });
 
       const { token, user } = response.data;
-      console.log(
-        "Google authentication successful, received token and user:",
-        { token, user },
-      );
+      
 
       login(token, user);
 
       navigate("/");
     } catch (error) {
-      console.error("Google authentication failed:", error);
       alert("Google sign-in failed, please try again");
     }
   };

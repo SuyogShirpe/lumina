@@ -1,0 +1,32 @@
+.maplibregl-popup-content {
+    padding: 0 !important;
+    background: transparent !important;
+    border-radius: 16px;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: hidden;
+}
+
+.maplibregl-popup-tip {
+    border-top-color: white !important; 
+}
+
+.maplibregl-popup {
+    max-width: 360px !important;
+}
+
+.maplibregl-popup-close-button {
+    top: 8px;
+    right: 8px;
+    color: #666;
+    font-size: 18px;
+    z-index: 10;
+}
+
+.incident-popup {
+    width: 320px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    overflow: hidden;
+}
