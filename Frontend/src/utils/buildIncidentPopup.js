@@ -4,7 +4,6 @@ import { getPhotoThumbnails } from "./getPhotoThumbnails";
 import "../stylesheets/incidentPopup.css";
 
 export const buildIncidentPopup = (incident) => {
-  const accentColor = incident.category?.colorHex || "#888888";
 
   const reporterName = incident.reporter?.name || "Anonymous";
 
@@ -18,8 +17,6 @@ export const buildIncidentPopup = (incident) => {
   const statusBadge = getStatusBadge(incident.status);
   const timeAgoText = timeAgo(incident.occurredAt);
   const photoThumbnails = getPhotoThumbnails(incident.photoUrls);
-
-  
 
   return `
 <div class="incident-popup">

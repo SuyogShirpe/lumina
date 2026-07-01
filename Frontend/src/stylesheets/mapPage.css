@@ -30,3 +30,35 @@
     box-shadow: 0 8px 24px rgba(0,0,0,.18);
     overflow: hidden;
 }
+
+.map-container {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+}
+
+.loading-box {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    background: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.filter-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 180px;
+}
+
+.map {
+    height: 100vh;
+    width: 100%;
+}

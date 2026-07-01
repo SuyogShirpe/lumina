@@ -2,6 +2,7 @@ import { OlaMaps } from "olamaps-web-sdk";
 import { useEffect, useRef, useState } from "react";
 import api from "../api/axiosInstance";
 import { buildIncidentPopup } from "../utils/buildIncidentPopup";
+import CategoryFilter from "./CategoryFilter";
 import "../stylesheets/mapPage.css";
 
 const apikey = import.meta.env.VITE_OLA_MAPS_API_KEY;
@@ -43,6 +44,8 @@ export default function MapPage() {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
   const fetchIncidents = async (lat, lng) => {
     try {
       setLoading(true);
@@ -50,7 +53,6 @@ export default function MapPage() {
         params: { lat, lng, radiusKm: 5 },
       });
       setIncidents(response.data);
-      console.log(response.data);
     } catch (error) {
       console.log("Error fetching incidents:", error);
     } finally {
@@ -60,6 +62,9 @@ export default function MapPage() {
 
   useEffect(() => {
     const handlePopupClick = async (event) => {
+      const target = event.target.closest("[data-action]");
+      if (!target) return;
+
       const { action, incidentId } = event.target.dataset;
 
       if (!action || !incidentId) return;
@@ -164,7 +169,16 @@ export default function MapPage() {
     markerRef.current.forEach((marker) => marker.remove());
     markerRef.current = [];
 
-    incidents.forEach((incident) => {
+    const filteredIncidents =
+    selectedCategories.length === 0
+        ? incidents
+        : incidents.filter((incident) =>
+              selectedCategories.includes(
+                  incident.category.categoryId
+              )
+          );
+
+    filteredIncidents.forEach((incident) => {
       const popup = new OlaMaps.Popup({
         offset: [0, -10],
         anchor: "bottom",
@@ -185,27 +199,21 @@ export default function MapPage() {
   }, [incidents, isMapLoaded]);
 
   return (
-    <div style={{ position: "relative", height: "100vh", width: "100%" }}>
-      {loading && (
-        <div
-          style={{
-            position: "absolute",
-            top: "16px",
-            right: "16px",
-            zIndex: 1000,
-            background: "white",
-            padding: "8px 14px",
-            borderRadius: "8px",
-            fontSize: "13px",
-            fontWeight: 500,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          }}
-        >
-          Loading incidents...
-        </div>
-      )}
+    <div className="map-container">
+    {loading && (
+      <div className="loading-box">
+        Loading incidents...
+      </div>
+    )}
 
-      <div id="map" style={{ height: "100vh", width: "100%" }} />
+    <div className="filter-container">
+      <CategoryFilter
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
+      />
     </div>
+
+    <div id="map" className="map" />
+  </div>
   );
 }
