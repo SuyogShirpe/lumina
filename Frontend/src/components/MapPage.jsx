@@ -1,9 +1,10 @@
 import { OlaMaps } from "olamaps-web-sdk";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import api from "../api/axiosInstance";
 import { buildIncidentPopup } from "../utils/buildIncidentPopup";
 import CategoryFilter from "./CategoryFilter";
 import "../stylesheets/mapPage.css";
+import IncidentSidebar from "./IncidentSidebar";
 
 const apikey = import.meta.env.VITE_OLA_MAPS_API_KEY;
 
@@ -35,6 +36,8 @@ const createUserLocationElement = () => {
   return el;
 };
 
+
+
 export default function MapPage() {
   const mapRef = useRef(null);
   const markerRef = useRef([]);
@@ -44,7 +47,8 @@ export default function MapPage() {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState(new Set());
+
 
   const fetchIncidents = async (lat, lng) => {
     try {
@@ -59,6 +63,8 @@ export default function MapPage() {
       setLoading(false);
     }
   };
+
+
 
   useEffect(() => {
     const handlePopupClick = async (event) => {
@@ -101,6 +107,8 @@ export default function MapPage() {
       document.removeEventListener("click", handlePopupClick);
     };
   }, [setIncidents]);
+
+
 
   useEffect(() => {
     let map;
@@ -163,20 +171,33 @@ export default function MapPage() {
     };
   }, []);
 
+
+  const handleIncidentClick = (incidnet) => {
+    mapRef.current.flyTo({
+      centre: [incident.lat , incident.lng],
+      zoom:18,
+    });
+  }
+
+
+
+  const filteredIncidents = useMemo(() => {
+    if (selectedCategories.length === 0) {
+      return incidents;
+    }
+
+    return incidents.filter((incident) =>
+      selectedCategories.has(incident.category.categoryId),
+    );
+  }, [incidents, selectedCategories]);
+
+
+
   useEffect(() => {
     if (!isMapLoaded || !mapRef.current) return;
 
     markerRef.current.forEach((marker) => marker.remove());
     markerRef.current = [];
-
-    const filteredIncidents =
-    selectedCategories.length === 0
-        ? incidents
-        : incidents.filter((incident) =>
-              selectedCategories.includes(
-                  incident.category.categoryId
-              )
-          );
 
     filteredIncidents.forEach((incident) => {
       const popup = new OlaMaps.Popup({
@@ -196,24 +217,29 @@ export default function MapPage() {
 
       markerRef.current.push(marker);
     });
-  }, [incidents, isMapLoaded]);
+  }, [filteredIncidents, isMapLoaded]);
+
+
 
   return (
     <div className="map-container">
-    {loading && (
-      <div className="loading-box">
-        Loading incidents...
-      </div>
-    )}
+    {loading && <div className="loading-box">Loading incidents...</div>}
 
-    <div className="filter-container">
+    
+    <div id="map" className="map" />
+
+    
+    <div className="right-panel">
       <CategoryFilter
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
       />
-    </div>
 
-    <div id="map" className="map" />
+      <IncidentSidebar
+        incidents={filteredIncidents}
+        onIncidentClick={handleIncidentClick}
+      />
+    </div>
   </div>
   );
 }

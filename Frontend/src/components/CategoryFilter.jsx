@@ -21,10 +21,16 @@ export default function CategoryFilter({
   }, []);
 
   const handleCategoryChange = (categoryId) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId],
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+
+      if(next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    }
     );
   };
 
@@ -36,7 +42,7 @@ export default function CategoryFilter({
 
     <div className="filter-list">
       {incidentCategories.map((category) => {
-        const checked = selectedCategories.includes(category.categoryId);
+        const checked = selectedCategories.has(category.categoryId);
 
         return (
           <label

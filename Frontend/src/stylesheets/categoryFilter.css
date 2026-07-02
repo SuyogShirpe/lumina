@@ -5,6 +5,7 @@
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
     overflow: hidden;
     font-family: "Inter", sans-serif;
+    flex: 0 0 auto;
 }
 
 .filter-header {
