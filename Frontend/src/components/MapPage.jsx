@@ -40,7 +40,7 @@ const createUserLocationElement = () => {
 
 export default function MapPage() {
   const mapRef = useRef(null);
-  const markerRef = useRef([]);
+  const markerRef = useRef(new Map());
   const olaMapsRef = useRef(null);
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -172,13 +172,19 @@ export default function MapPage() {
   }, []);
 
 
-  const handleIncidentClick = (incidnet) => {
+  const handleIncidentClick = (incident) => {
     mapRef.current.flyTo({
-      centre: [incident.lat , incident.lng],
+      center: [incident.lat , incident.lng],
       zoom:18,
     });
   }
 
+  const onIncidentClick = (incident) => {
+    const marker = markerRef.current.get(incident.incidentId);
+    if(!marker) return;
+
+    marker.togglePopup();
+  }
 
 
   const filteredIncidents = useMemo(() => {
@@ -197,7 +203,7 @@ export default function MapPage() {
     if (!isMapLoaded || !mapRef.current) return;
 
     markerRef.current.forEach((marker) => marker.remove());
-    markerRef.current = [];
+    markerRef.current.clear();
 
     filteredIncidents.forEach((incident) => {
       const popup = new OlaMaps.Popup({
@@ -215,7 +221,7 @@ export default function MapPage() {
         .setPopup(popup)
         .addTo(mapRef.current);
 
-      markerRef.current.push(marker);
+      markerRef.current.set(incident.incidentId, marker);
     });
   }, [filteredIncidents, isMapLoaded]);
 
@@ -237,7 +243,7 @@ export default function MapPage() {
 
       <IncidentSidebar
         incidents={filteredIncidents}
-        onIncidentClick={handleIncidentClick}
+        onIncidentClick={onIncidentClick}
       />
     </div>
   </div>
