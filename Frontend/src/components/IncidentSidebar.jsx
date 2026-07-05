@@ -15,7 +15,7 @@ export default function IncidentSidebar({ incidents, onIncidentClick }) {
     <div className="incident-sidebar">
       {incidents.map((incident) => (
         <div
-          key={incident.id}
+          key={incident.incidentId}
           className="incident-card"
           onClick={() => onIncidentClick(incident)}
         >
@@ -23,7 +23,7 @@ export default function IncidentSidebar({ incidents, onIncidentClick }) {
             <span
               className="category-dot"
               style={{
-                backgroundColor: incident.colorHex || "#6b7280",
+                backgroundColor: incident.category?.colorHex || "#6b7280",
               }}
             />
 
@@ -31,13 +31,13 @@ export default function IncidentSidebar({ incidents, onIncidentClick }) {
           </div>
 
           <p className="incident-distance">
-            {incident.distance != null ? incident.distance.toFixed(2) : "N/A"} km away
+            {incident.distance != null ? incident.distanceKm.toFixed(2) : "N/A"} km away
           </p>
 
           <p className="incident-time">{timeAgo(incident.occurredAt)}</p>
 
           <div className="incident-footer">
-            <span>👍 {incident.upvotes}</span>
+            <span>👍 {incident.upvoteCount}</span>
 
             <span className={`status ${incident.status.toLowerCase()}`}>
               {incident.status}

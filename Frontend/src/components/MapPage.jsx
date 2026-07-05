@@ -5,6 +5,7 @@ import { buildIncidentPopup } from "../utils/buildIncidentPopup";
 import CategoryFilter from "./CategoryFilter";
 import "../stylesheets/mapPage.css";
 import IncidentSidebar from "./IncidentSidebar";
+import RadiusSlider from "./RadiusSlider";
 
 const apikey = import.meta.env.VITE_OLA_MAPS_API_KEY;
 
@@ -43,11 +44,14 @@ export default function MapPage() {
   const markerRef = useRef(new Map());
   const olaMapsRef = useRef(null);
 
+  const [userLocation, setUserLocation] = useState(null);
+  const [radiusKm, setRadiusKm] = useState(5);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [selectedCategories, setSelectedCategories] = useState(new Set());
+
 
 
   const fetchIncidents = async (lat, lng) => {
@@ -134,10 +138,16 @@ export default function MapPage() {
 
           navigator.geolocation.getCurrentPosition(
             (position) => {
-              const { latitude, longitude } = position.coords;
+              
+              const location = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              }
+
+              setUserLocation(location);
 
               map.flyTo({
-                center: [longitude, latitude],
+                center: [location.lng, location.lat],
                 zoom: 14,
                 duration: 1500,
               });
@@ -147,10 +157,10 @@ export default function MapPage() {
                 offset: [0, 0],
                 anchor: "center",
               })
-                .setLngLat([longitude, latitude])
+                .setLngLat([location.lng, location.lat])
                 .addTo(map);
 
-              fetchIncidents(latitude, longitude);
+              fetchIncidents(location.lat, location.lng);
             },
             (error) => {
               console.error("Geolocation error:", error);
@@ -226,6 +236,25 @@ export default function MapPage() {
   }, [filteredIncidents, isMapLoaded]);
 
 
+  useEffect(() => {
+
+    if(!userLocation) return;
+
+    const timer = setTimeout(() => {
+      fetchIncidents(
+        userLocation.lat,
+        userLocation.lng,
+        radiusKm
+      )
+    }, 500);
+
+    return () => clearTimeout(timer);
+
+
+  }, [radiusKm, userLocation]);
+  
+
+
 
   return (
     <div className="map-container">
@@ -236,6 +265,13 @@ export default function MapPage() {
 
     
     <div className="right-panel">
+
+      <RadiusSlider
+        value={radiusKm}
+        onChange={setRadiusKm} 
+      />
+
+
       <CategoryFilter
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
