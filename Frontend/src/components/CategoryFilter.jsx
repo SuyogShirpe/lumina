@@ -6,19 +6,8 @@ export default function CategoryFilter({
   selectedCategories,
   setSelectedCategories,
 }) {
-  const [incidentCategories, setIncidentCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchIncidentCategories = async () => {
-      try {
-        const response = await api.get("/api/incidents/categories");
-        setIncidentCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching incident categories:", error);
-      }
-    };
-    fetchIncidentCategories();
-  }, []);
+  
+  const { incidentCategories, loading } = useCategoryContext();
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategories((prev) => {
