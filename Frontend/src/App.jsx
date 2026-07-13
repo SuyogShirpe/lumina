@@ -5,6 +5,7 @@ import UserProfile from "./components/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import MapPage from "./components/MapPage";
+import ReportPage from "./components/ReportPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<MapPage />} />
+        <Route path="/report" element={<ReportPage />} />
         <Route path="/profile" element={<UserProfile />} />
       </Route>
 

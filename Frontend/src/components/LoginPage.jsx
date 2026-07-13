@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../contexts/AuthProvider";
 import { GoogleLogin } from "@react-oauth/google";
 import api from "../api/axiosInstance";
 import logo from "../assets/logo.png";

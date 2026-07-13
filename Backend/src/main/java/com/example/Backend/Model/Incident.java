@@ -34,7 +34,11 @@ public class Incident {
 
     private String title;
     private String description;
+
+    @Column(precision = 10, scale = 6)
     private BigDecimal lat;
+
+    @Column(precision = 10, scale = 6)
     private BigDecimal lng;
 
     @Enumerated(EnumType.STRING)

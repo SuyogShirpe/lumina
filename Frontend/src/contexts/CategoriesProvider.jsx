@@ -3,7 +3,7 @@ import api from "../api/axiosInstance";
 
 const CategoryContext = createContext();
 
-export default function CategoryContext({ children }) {
+export default function CategoriesProvider({ children }) {
   const [incidentCategories, setIncidentCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export default function CategoryContext({ children }) {
 }
 
 export const useCategoryContext = () => {
-  const context = useContect(CategoryContext);
+  const context = useContext(CategoryContext);
 
   if (!context) {
     throw new Error("useCategories must be used within a CategoriesProvider");

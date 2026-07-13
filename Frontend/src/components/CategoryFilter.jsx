@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axiosInstance";
 import "../stylesheets/categoryFilter.css";
+import { useCategoryContext } from "../contexts/CategoriesProvider";
 
 export default function CategoryFilter({
   selectedCategories,
