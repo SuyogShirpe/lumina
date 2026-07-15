@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axiosInstance";
 import { useNavigate, useParams } from "react-router-dom";
+import PhotoGallery from "./PhotoGallery";
 
 export default function IncidentDetailPage() {
   const navigate = useNavigate();
@@ -65,5 +66,9 @@ export default function IncidentDetailPage() {
     );
   }
 
-  return <></>;
+  return (
+    <div className="container py-4">
+      <PhotoGallery incident={incident} VITE_API_BASE_URL={VITE_API_BASE_URL} />
+    </div>
+  );
 }
