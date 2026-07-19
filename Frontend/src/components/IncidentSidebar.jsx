@@ -2,7 +2,7 @@ import { timeAgo } from "../utils/timeAgo";
 import "../stylesheets/IncidentSidebar.css";
 
 export default function IncidentSidebar({ incidents, onIncidentClick }) {
-  if (incidents.length === 0) {
+  if (!incidents?.length) {
     return (
       <div className="sidebar-empty">
         <h4>No incidents found nearby.</h4>
@@ -31,7 +31,7 @@ export default function IncidentSidebar({ incidents, onIncidentClick }) {
           </div>
 
           <p className="incident-distance">
-            {incident.distance != null ? incident.distanceKm.toFixed(2) : "N/A"} km away
+            {incident.distanceKm != null ? incident.distanceKm.toFixed(2) : "N/A"} km away
           </p>
 
           <p className="incident-time">{timeAgo(incident.occurredAt)}</p>
@@ -39,7 +39,7 @@ export default function IncidentSidebar({ incidents, onIncidentClick }) {
           <div className="incident-footer">
             <span>👍 {incident.upvoteCount}</span>
 
-            <span className={`status ${incident.status.toLowerCase()}`}>
+            <span className={`status ${incident.status?.toLowerCase() || ""}`}>
               {incident.status}
             </span>
           </div>

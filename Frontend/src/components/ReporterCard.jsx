@@ -41,11 +41,7 @@ export default function ReporterCard({ reporter }){
         )}
 
         <div>
-          <h5 className="mb-1">{reporter.name}</h5>
-
-          <Link to={`/users/${reporter.userId}`}>
-            View Profile
-          </Link>
+          <h5 className="mb-1">{reporter.name}</h5> 
         </div>
 
       </div>
