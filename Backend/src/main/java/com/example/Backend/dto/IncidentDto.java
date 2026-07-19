@@ -16,6 +16,7 @@ public class IncidentDto {
     BigDecimal lng;
     Double distanceKm;
     Status status;
+    Boolean userHasVoted;
     Integer upvoteCount;
     LocalDateTime occurredAt;
     LocalDateTime createdAt;

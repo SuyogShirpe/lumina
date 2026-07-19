@@ -1,13 +1,18 @@
 package com.example.Backend.mapper;
 
 
+import java.util.List;
+
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import com.example.Backend.Model.Incident;
 import com.example.Backend.Model.IncidentPhoto;
 import com.example.Backend.dto.IncidentDto;
 import com.example.Backend.dto.IncidentRequestDto;
-import org.mapstruct.*;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring",
         uses = {
@@ -18,6 +23,7 @@ public interface IncidentMapper {
     @Mapping(source = "user", target = "reporter")
     @Mapping(source = "photos", target = "photoUrls")
     @Mapping(target = "distanceKm", ignore = true)
+    @Mapping(target = "userHasVoted", ignore = true)
     IncidentDto toDto(Incident incident, @Context Double distanceKm);
 
     @Mapping(target = "incidentId", ignore = true)

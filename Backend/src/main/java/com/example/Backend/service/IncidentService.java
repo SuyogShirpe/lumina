@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -79,6 +78,15 @@ public class IncidentService {
 
         IncidentDto dto = incidentMapper.toDto(incident, null);
 
+        try{
+            User user = getCurrentUser();
+            dto.setUserHasVoted(false);
+            if(incidentVoteRepo.existsByIncidentAndUser(incident, user)){
+                dto.setUserHasVoted(true);
+            }
+        } catch (UsernameNotFoundException e){
+            System.out.println(e);
+        }
         return dto;
     }
 
