@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import api from "../api/axiosInstance";
 import { useNavigate, useParams } from "react-router-dom";
 import PhotoGallery from "./PhotoGallery";
+import ReporterCard from "./ReporterCard";
+import MiniMap from "./MiniMap";
 
 export default function IncidentDetailPage() {
+  const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   const navigate = useNavigate();
   const { id } = useParams();
   const [incident, setIncident] = useState(null);
@@ -68,7 +72,9 @@ export default function IncidentDetailPage() {
 
   return (
     <div className="container py-4">
-      <PhotoGallery incident={incident} VITE_API_BASE_URL={VITE_API_BASE_URL} />
+      {incident?.reporter && <ReporterCard reporter={incident.reporter} />}
+      <MiniMap incident={incident} />
+      <PhotoGallery incident={incident} />
     </div>
   );
 }
