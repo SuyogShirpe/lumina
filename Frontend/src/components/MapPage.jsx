@@ -1,5 +1,6 @@
 import { OlaMaps } from "olamaps-web-sdk";
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axiosInstance";
 import { buildIncidentPopup } from "../utils/buildIncidentPopup";
 import CategoryFilter from "./CategoryFilter";
@@ -51,6 +52,8 @@ export default function MapPage() {
   const [loading, setLoading] = useState(false);
 
   const [selectedCategories, setSelectedCategories] = useState(new Set());
+
+  const navigate = useNavigate();
 
 
 
@@ -220,6 +223,17 @@ export default function MapPage() {
         offset: [0, -10],
         anchor: "bottom",
       }).setHTML(buildIncidentPopup(incident));
+
+      popup.on("open" , () => {
+        const popupEl = popup.getElement();
+
+        const detailsBtn = popupEl.querySelector(".details-btn")
+
+        detailsBtn?.addEventListener("click", () => {
+          navigate(`/incidents/${incident.incidentId}`);
+        })
+      })
+      
 
       const marker = new OlaMaps.Marker({
         element: createColoredMarkerElement(

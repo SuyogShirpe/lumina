@@ -16,11 +16,13 @@
 }
 
 .maplibregl-popup-close-button {
-    top: 8px;
-    right: 8px;
-    color: #666;
-    font-size: 18px;
-    z-index: 10;
+   top: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+  line-height: 24px;
+  padding: 0;
 }
 
 .incident-popup {
