@@ -51,7 +51,7 @@
 }
 
 .status.active {
-    background: #ef4444;
+    background: crimson;
 }
 
 .status.resolved {

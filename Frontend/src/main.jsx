@@ -7,7 +7,6 @@ import { AuthProvider } from "./contexts/AuthProvider.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Toaster, toast } from "sonner";
-import CategoriesProvider from "./contexts/CategoriesProvider.jsx"
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -16,9 +15,7 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <GoogleOAuthProvider clientId={clientId}>
         <AuthProvider>
-          <CategoriesProvider>
             <App />
-          </CategoriesProvider>
         </AuthProvider>
       </GoogleOAuthProvider>
     </BrowserRouter>

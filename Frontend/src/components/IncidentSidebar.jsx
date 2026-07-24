@@ -39,7 +39,7 @@ export default function IncidentSidebar({ incidents, onIncidentClick }) {
           <div className="incident-footer">
             <span>👍 {incident.upvoteCount}</span>
 
-            <span className={`status ${incident.status?.toLowerCase() || ""}`}>
+            <span className={` status ${incident.status?.toLowerCase() || ""}`}>
               {incident.status}
             </span>
           </div>

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/axiosInstance";
 
-const CategoryContext = createContext();
+const CategoryContext = createContext(null);
 
 export default function CategoriesProvider({ children }) {
   const [incidentCategories, setIncidentCategories] = useState([]);

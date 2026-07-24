@@ -8,12 +8,10 @@ import { toast } from "sonner";
 import "../stylesheets/incidentDetails.css";
 
 export default function IncidentDetailPage() {
-  const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
   const navigate = useNavigate();
   const { id } = useParams();
   const [incident, setIncident] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userHasVoted, setUserHasVoted] = useState(false);
   const [upvoteCount, setUpvoteCount] = useState(0);
@@ -34,7 +32,7 @@ export default function IncidentDetailPage() {
       }
     };
     fetchIncident(id);
-  }, []);
+  }, [id]);
 
   if (loading) {
     return (
@@ -77,8 +75,8 @@ export default function IncidentDetailPage() {
   }
 
   const handleVote = async () => {
-    const prevCount = incident.upvoteCount;
-    const prevVoted = incident.userHasVoted;
+    const prevCount = upvoteCount;
+    const prevVoted = userHasVoted;
 
     const newVoted = !userHasVoted;
     const newCount = newVoted ? upvoteCount + 1 : upvoteCount - 1;
@@ -101,6 +99,9 @@ export default function IncidentDetailPage() {
 
   return (
     <div className="container py-4 incident-page">
+      <button className="btn btn-link mb-3 ps-0" onClick={() => navigate("/")}>
+        ← Back to map
+      </button>
       <div className="card shadow-sm border-0 rounded-4 mb-4 incident-card">
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-start flex-wrap">
@@ -123,10 +124,12 @@ export default function IncidentDetailPage() {
             <span
               className={`badge px-3 py-2 ${
                 incident.status === "ACTIVE"
-                  ? "bg-success"
-                  : incident.status === "PENDING"
-                    ? "bg-warning text-dark"
-                    : "bg-secondary"
+                  ? "bg-danger"
+                  : incident.status === "RESOLVED"
+                    ? "bg-success"
+                    : incident.status === "PENDING"
+                      ? "bg-warning text-dark"
+                      : "bg-secondary"
               }`}
             >
               {incident.status}

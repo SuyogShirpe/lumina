@@ -1,8 +1,8 @@
 export function getStatusBadge(status) {
   const styles = {
-    ACTIVE: "background:#dcfce7;color:#166534;",
-    RESOLVED: "background:#f1f5f9;color:#475569;",
-    FLAGGED: "background:#fef2f2;color:#991b1b;",
+    ACTIVE: "background:#fef2f2;color:#991b1b;",    
+  RESOLVED: "background:#dcfce7;color:#166534;",   
+  FLAGGED: "background:#fefce8;color:#854d0e;", 
   };
   return `<span style="
         ${styles[status] || styles.ACTIVE}

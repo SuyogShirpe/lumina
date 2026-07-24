@@ -7,18 +7,20 @@ import AdminRoute from "./components/AdminRoute";
 import MapPage from "./components/MapPage";
 import ReportPage from "./components/ReportPage";
 import IncidentDetailPage from "./components/IncidentDetailPage";
+import ProtectedLayout from "./components/ProtectedLayout"
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
-
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<MapPage />} />
-        <Route path="/report" element={<ReportPage />} />
-        <Route path="/incidents/:id" element={<IncidentDetailPage />} />
-        <Route path="/profile" element={<UserProfile />} />
+        <Route element={<ProtectedLayout />}>
+          <Route path="/" element={<MapPage />} />
+          <Route path="/report" element={<ReportPage />} />
+          <Route path="/incidents/:id" element={<IncidentDetailPage />} />
+          <Route path="/profile" element={<UserProfile />} />
+        </Route>
       </Route>
 
       <Route element={<AdminRoute />}>

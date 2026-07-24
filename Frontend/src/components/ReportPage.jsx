@@ -23,7 +23,6 @@ export default function ReportPage() {
   const [photoError, setPhotoError] = useState("");
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [userLocation, setUserLocation] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,7 +71,7 @@ export default function ReportPage() {
         URL.revokeObjectURL(photo.preview);
       });
     };
-  }, [photos]);
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -110,7 +109,6 @@ export default function ReportPage() {
     e.preventDefault();
 
     if (!validateForm()) {
-      setSubmitting(false);
       return;
     }
     setSubmitting(true);
@@ -168,7 +166,6 @@ export default function ReportPage() {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
-        setUserLocation(location);
         setFormData((prev) => ({
           ...prev,
           lat: location.lat,

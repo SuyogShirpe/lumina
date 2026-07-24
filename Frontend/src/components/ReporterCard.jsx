@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
+
 export default function ReporterCard({ reporter }){
-    const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     if (!reporter) return null;
 
@@ -19,7 +18,7 @@ export default function ReporterCard({ reporter }){
 
         {reporter.avatarUrl ? (
           <img
-            src={`${VITE_API_BASE_URL}/${reporter.avatarUrl}`}
+            src={reporter.avatarUrl}
             alt={reporter.name}
             width={64}
             height={64}

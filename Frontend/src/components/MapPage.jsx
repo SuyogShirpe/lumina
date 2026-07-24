@@ -38,12 +38,10 @@ const createUserLocationElement = () => {
   return el;
 };
 
-
-
 export default function MapPage() {
   const mapRef = useRef(null);
   const markerRef = useRef(new Map());
-  const olaMapsRef = useRef(null);
+  const userMarkerRef = useRef(null)
 
   const [userLocation, setUserLocation] = useState(null);
   const [radiusKm, setRadiusKm] = useState(5);
@@ -55,13 +53,11 @@ export default function MapPage() {
 
   const navigate = useNavigate();
 
-
-
-  const fetchIncidents = async (lat, lng) => {
+  const fetchIncidents = async (lat, lng, radius = 5) => {
     try {
       setLoading(true);
       const response = await api.get("/api/incidents", {
-        params: { lat, lng, radiusKm: 5 },
+        params: { lat, lng, radiusKm: radius },
       });
       setIncidents(response.data);
     } catch (error) {
@@ -71,14 +67,12 @@ export default function MapPage() {
     }
   };
 
-
-
   useEffect(() => {
     const handlePopupClick = async (event) => {
       const target = event.target.closest("[data-action]");
       if (!target) return;
 
-      const { action, incidentId } = event.target.dataset;
+      const { action, incidentId } = target.dataset;
 
       if (!action || !incidentId) return;
 
@@ -104,7 +98,7 @@ export default function MapPage() {
       }
 
       if (action === "details") {
-        window.location.href = `/incidents/${incidentId}`;
+        navigate(`/incidents/${incidentId}`);
       }
     };
 
@@ -113,20 +107,18 @@ export default function MapPage() {
     return () => {
       document.removeEventListener("click", handlePopupClick);
     };
-  }, [setIncidents]);
-
-
+  }, []);
 
   useEffect(() => {
     let map;
 
     const initMap = async () => {
       try {
-        olaMapsRef.current = new OlaMaps({
+        const olaMaps = new OlaMaps({
           apiKey: apikey,
         });
 
-        map = await olaMapsRef.current.init({
+        map = await olaMaps.init({
           style:
             "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
           container: "map",
@@ -141,11 +133,10 @@ export default function MapPage() {
 
           navigator.geolocation.getCurrentPosition(
             (position) => {
-              
               const location = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude,
-              }
+              };
 
               setUserLocation(location);
 
@@ -155,7 +146,12 @@ export default function MapPage() {
                 duration: 1500,
               });
 
-              new OlaMaps.Marker({
+              if(userMarkerRef.current){
+                userMarkerRef.current.remove();
+              }
+              
+
+              userMarkerRef.current = new OlaMaps.Marker({
                 element: createUserLocationElement(),
                 offset: [0, 0],
                 anchor: "center",
@@ -178,30 +174,28 @@ export default function MapPage() {
     initMap();
 
     return () => {
+      markerRef.current.forEach(marker => marker.remove());
+      markerRef.current.clear();
+      userMarkerRef.current?.remove();
+
       if (map) {
         map.remove();
       }
     };
   }, []);
 
-
-  const handleIncidentClick = (incident) => {
-    mapRef.current.flyTo({
-      center: [incident.lat , incident.lng],
-      zoom:18,
-    });
-  }
-
   const onIncidentClick = (incident) => {
+    mapRef.current.flyTo({
+      center: [Number(incident.lng), Number(incident.lat)],
+      zoom: 15,
+      duration: 800,
+    });
     const marker = markerRef.current.get(incident.incidentId);
-    if(!marker) return;
-
-    marker.togglePopup();
-  }
-
+    if (marker) marker.togglePopup();
+  };
 
   const filteredIncidents = useMemo(() => {
-    if (selectedCategories.length === 0) {
+    if (selectedCategories.size === 0) {
       return incidents;
     }
 
@@ -209,8 +203,6 @@ export default function MapPage() {
       selectedCategories.has(incident.category.categoryId),
     );
   }, [incidents, selectedCategories]);
-
-
 
   useEffect(() => {
     if (!isMapLoaded || !mapRef.current) return;
@@ -223,17 +215,6 @@ export default function MapPage() {
         offset: [0, -10],
         anchor: "bottom",
       }).setHTML(buildIncidentPopup(incident));
-
-      popup.on("open" , () => {
-        const popupEl = popup.getElement();
-
-        const detailsBtn = popupEl.querySelector(".details-btn")
-
-        detailsBtn?.addEventListener("click", () => {
-          navigate(`/incidents/${incident.incidentId}`);
-        })
-      })
-      
 
       const marker = new OlaMaps.Marker({
         element: createColoredMarkerElement(
@@ -249,53 +230,35 @@ export default function MapPage() {
     });
   }, [filteredIncidents, isMapLoaded]);
 
-
   useEffect(() => {
-
-    if(!userLocation) return;
+    if (!userLocation) return;
 
     const timer = setTimeout(() => {
-      fetchIncidents(
-        userLocation.lat,
-        userLocation.lng,
-        radiusKm
-      )
+      fetchIncidents(userLocation.lat, userLocation.lng, radiusKm);
     }, 500);
 
     return () => clearTimeout(timer);
-
-
   }, [radiusKm, userLocation]);
-  
-
-
 
   return (
     <div className="map-container">
-    {loading && <div className="loading-box">Loading incidents...</div>}
+      {loading && <div className="loading-box">Loading incidents...</div>}
 
-    
-    <div id="map" className="map" />
+      <div id="map" className="map" />
 
-    
-    <div className="right-panel">
+      <div className="right-panel">
+        <RadiusSlider value={radiusKm} onChange={setRadiusKm} />
 
-      <RadiusSlider
-        value={radiusKm}
-        onChange={setRadiusKm} 
-      />
+        <CategoryFilter
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
+        />
 
-
-      <CategoryFilter
-        selectedCategories={selectedCategories}
-        setSelectedCategories={setSelectedCategories}
-      />
-
-      <IncidentSidebar
-        incidents={filteredIncidents}
-        onIncidentClick={onIncidentClick}
-      />
+        <IncidentSidebar
+          incidents={filteredIncidents}
+          onIncidentClick={onIncidentClick}
+        />
+      </div>
     </div>
-  </div>
   );
 }

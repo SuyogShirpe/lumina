@@ -18,10 +18,11 @@ const createColoredMarkerElement = (color) => {
 };
 
 export default function MiniMap({ incident }) {
-
-    const containerRef = useRef(null);
+  const containerRef = useRef(null);
   useEffect(() => {
     if (!incident) return;
+
+    if (!containerRef.current) return;
 
     if (incident?.lat == null || incident?.lng == null) return;
 
@@ -29,40 +30,48 @@ export default function MiniMap({ incident }) {
     let cancelled = false;
 
     const initMap = async () => {
-      const olaMaps = new OlaMaps({
-        apiKey: apikey,
-      });
+      try {
+        const olaMaps = new OlaMaps({
+          apiKey: apikey,
+        });
 
-      map = await olaMaps.init({
-        style:
-          "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
-        container: containerRef.current,
-        center: [incident.lng, incident.lat],
-        zoom: 16,
-        dragPan: false,
-        scrollZoom: false,
-        doubleClickZoom: false,
-      });
+        map = await olaMaps.init({
+          style:
+            "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json",
+          container: containerRef.current,
+          center: [incident.lng, incident.lat],
+          zoom: 16,
+          dragPan: false,
+          scrollZoom: false,
+          doubleClickZoom: false,
+          dragRotate: false,
+          touchZoomRotate: false,
+          keyboard: false,
+        });
 
-      new OlaMaps.Marker({
-        element: createColoredMarkerElement(
-          incident.category?.colorHex ?? "#ef4444",
-        ),
-        offset: [0, 0],
-        anchor: "center",
-      })
-        .setLngLat([incident.lng, incident.lat])
-        .addTo(map);
+        if (cancelled) {
+          map.remove();
+          return;
+        }
 
-      if (cancelled) {
-        map.remove();
-        return;
+        new OlaMaps.Marker({
+          element: createColoredMarkerElement(
+            incident.category?.colorHex ?? "#ef4444",
+          ),
+          offset: [0, 0],
+          anchor: "center",
+        })
+          .setLngLat([incident.lng, incident.lat])
+          .addTo(map);
+      } catch (error) {
+        console.error("Mini map initialization failed:", error);
       }
     };
 
     initMap();
 
     return () => {
+      cancelled = true;
       if (map) {
         map.remove();
       }

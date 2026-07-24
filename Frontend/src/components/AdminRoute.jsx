@@ -1,7 +1,5 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthProvider";
-import { Navigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import Forbidden from "./Forbidden";
 
 export default function AdminRoute() {
