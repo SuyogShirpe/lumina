@@ -2,6 +2,10 @@ package com.example.Backend.repo;
 
 import java.util.List;
 
+import com.example.Backend.Model.Status;
+import com.example.Backend.Model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,4 +45,8 @@ public interface IncidentRepo extends JpaRepository<Incident, Long> {
             @Param("lat") Double lat,
             @Param("lng") Double lng,
             @Param("radiusKm") Double radiusKm);
+
+    List<Incident> findByUser(User user);
+
+    Page<Incident> findByStatus(Status incidentStatus, Pageable pageable);
 }
