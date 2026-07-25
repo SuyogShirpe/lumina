@@ -9,7 +9,7 @@ import { timeAgo } from "../utils/timeAgo";
 export default function UserProfile() {
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
-  const [incidentLoading , setIncidentLoading] = useState(true);
+  const [incidentLoading, setIncidentLoading] = useState(true);
   const [incidents, setIncidents] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -103,7 +103,7 @@ export default function UserProfile() {
   }
 
   return (
-    <>
+    <div className="dashboard">
       <div className="profile-container">
         <div className="profile-card">
           <img
@@ -125,6 +125,23 @@ export default function UserProfile() {
             Logout
           </button>
         </div>
+
+        <div className="stats">
+          <div className="stat-card">
+            <h4>Total Reported Incidents</h4>
+            <h2>{stats.total}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h4>Upvotes</h4>
+            <h2>{stats.totalUpvotes}</h2>
+          </div>
+
+          <div className="stat-card">
+            <h4>Incidents Resolved</h4>
+            <h2>{stats.resolved}</h2>
+          </div>
+        </div>
       </div>
 
       <div className="incident-container">
@@ -141,7 +158,6 @@ export default function UserProfile() {
                   backgroundColor: incident.category?.colorHex || "#6b7280",
                 }}
               />
-
               <span className="category-name">{incident.category?.name}</span>
             </div>
 
@@ -152,9 +168,7 @@ export default function UserProfile() {
             <div className="incident-footer">
               <span>👍 {incident.upvoteCount}</span>
 
-              <span
-                className={`status ${incident.status?.toLowerCase() || ""}`}
-              >
+              <span className={`status ${incident.status?.toLowerCase()}`}>
                 {incident.status}
               </span>
             </div>
@@ -166,14 +180,13 @@ export default function UserProfile() {
                   e.stopPropagation();
                   handleDelete(incident.incidentId);
                 }}
-                disabled={deletingId === incident.incidentId}
               >
-                {deletingId === incident.incidentId ? "Deleting..." : "Delete"}
+                Delete
               </button>
             )}
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }
