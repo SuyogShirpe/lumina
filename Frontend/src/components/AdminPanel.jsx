@@ -49,7 +49,6 @@ export default function AdminPanel() {
       setStatLoading(true);
 
       const response = await api.get("/api/admin/stats");
-      console.log(response.data);
       setStats({
         total: response.data.total,
         active: response.data.active,
@@ -128,7 +127,7 @@ export default function AdminPanel() {
   const handlePageChange = (newPage) => {
     if (newPage < 0 || newPage >= totalPages) return;
 
-    fetchIncidents(newPage);
+    setCurrentPage(newPage);
   };
 
   return (
@@ -257,6 +256,41 @@ export default function AdminPanel() {
           </tbody>
         </table>
       </div>
+
+      <nav className="mt-4">
+        <ul className="pagination justify-content-center">
+          <li className={`page-item ${currentPage == 0 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              disabled={currentPage === 0}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Previous
+            </button>
+          </li>
+
+          {[...Array(totalPages)].map((_, index) => (
+            <li
+              key={index}
+              className={`page-item ${currentPage === index ? "active" : ""}`}
+            >
+              <button className="page-link" onClick={() =>handlePageChange(index)}>
+                {index + 1}
+              </button>
+            </li>
+          ))}
+
+          <li className={`page-item ${currentPage === totalPages - 1 ? "disabled" : ""}`}>
+            <button
+              className="page-link"
+              disabled={currentPage === totalPages - 1}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 }
