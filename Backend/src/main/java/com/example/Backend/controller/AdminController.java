@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -19,5 +21,11 @@ public class AdminController {
     public Page<IncidentDto> getAllIncidents(@RequestParam(defaultValue = "0") int page ,@RequestParam(defaultValue = "10") int size ,@RequestParam(required = false) String status){
 
         return adminService.getAllIncidents(0,10,status);
+    }
+
+    @GetMapping("/stats")
+    public Map<String , Long> getStats(){
+
+        return adminService.getStats();
     }
 }

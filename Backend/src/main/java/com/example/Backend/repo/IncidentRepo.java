@@ -49,4 +49,6 @@ public interface IncidentRepo extends JpaRepository<Incident, Long> {
     List<Incident> findByUser(User user);
 
     Page<Incident> findByStatus(Status incidentStatus, Pageable pageable);
+
+    Long countByStatus(Status status);
 }

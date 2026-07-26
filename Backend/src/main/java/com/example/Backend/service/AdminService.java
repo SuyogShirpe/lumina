@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class AdminService {
 
@@ -39,5 +41,15 @@ public class AdminService {
         }
 
         return incidents.map(incident -> incidentMapper.toDto(incident, null));
+    }
+
+    public Map<String , Long> getStats() {
+
+        return Map.of(
+                "total",incidentRepo.count(),
+                "active",incidentRepo.countByStatus(Status.ACTIVE),
+                "resolved",incidentRepo.countByStatus(Status.RESOLVED),
+                "flagged",incidentRepo.countByStatus(Status.FLAGGED)
+        );
     }
 }
