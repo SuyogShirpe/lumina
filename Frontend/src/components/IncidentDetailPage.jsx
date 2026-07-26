@@ -163,7 +163,7 @@ export default function IncidentDetailPage() {
           <div className="row">
             <div className="col-md-6 info-item">
               <span>Incident ID</span>
-              <strong>#{incident.incidentId}</strong>
+              <strong>{incident.incidentId}</strong>
             </div>
 
             <div className="col-md-6 info-item">

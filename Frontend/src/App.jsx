@@ -7,7 +7,8 @@ import AdminRoute from "./components/AdminRoute";
 import MapPage from "./components/MapPage";
 import ReportPage from "./components/ReportPage";
 import IncidentDetailPage from "./components/IncidentDetailPage";
-import ProtectedLayout from "./components/ProtectedLayout"
+import ProtectedLayout from "./components/ProtectedLayout";
+import AdminPanel from "./components/AdminPanel";
 
 function App() {
   return (
@@ -24,8 +25,8 @@ function App() {
       </Route>
 
       <Route element={<AdminRoute />}>
-        <Route path="/admin" element={<div>Admin Panel coming soon...</div>} />
-      </Route>
+    <Route path="/admin" element={<AdminPanel />} />
+</Route>
     </Routes>
   );
 }

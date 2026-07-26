@@ -3,7 +3,6 @@ import { useAuth } from "../contexts/AuthProvider";
 import Forbidden from "./Forbidden";
 
 export default function AdminRoute() {
-  const navigate = useNavigate();
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
