@@ -216,9 +216,9 @@ export default function AdminPanel() {
 
                   <td>{incident.title}</td>
 
-                  <td>{incident.categoryName}</td>
+                  <td>{incident.category.name}</td>
 
-                  <td>{incident.reportedBy?.name}</td>
+                  <td>{incident.reporter?.name}</td>
 
                   <td>{new Date(incident.createdAt).toLocaleDateString()}</td>
 

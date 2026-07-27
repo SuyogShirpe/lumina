@@ -99,8 +99,8 @@ export default function IncidentDetailPage() {
 
   return (
     <div className="container py-4 incident-page">
-      <button className="btn btn-link mb-3 ps-0" onClick={() => navigate("/")}>
-        ← Back to map
+      <button className="btn back-btn mb-3" onClick={() => navigate("/")}>
+        ←
       </button>
       <div className="card shadow-sm border-0 rounded-4 mb-4 incident-card">
         <div className="card-body">
