@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthProvider.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Toaster, toast } from "sonner";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 

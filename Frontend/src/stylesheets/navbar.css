@@ -1,0 +1,128 @@
+/* Navbar */
+.navbar {
+  height: 60px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  border-bottom: 1px solid #e8eaed;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Left */
+.left-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.name {
+  font-size: 24px;
+  font-weight: 500;
+  color: #202124;
+  letter-spacing: -0.3px;
+  transition: 0.2s;
+}
+
+.name:hover {
+  color: #1a73e8;
+}
+
+/* Right */
+.right-side {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-right: 50px;
+}
+
+/* Navigation Links */
+.map-link,
+.admin-link {
+  color: #5f6368;
+  font-size: 15px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.map-link:hover,
+.admin-link:hover {
+  color: #1a73e8;
+}
+
+/* Report Button */
+.report-btn {
+  background: #1a73e8;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.25s;
+}
+
+.report-btn:hover {
+  background: #1765cc;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+/* Avatar */
+.profile {
+  position: relative;
+}
+
+.profile img,
+.profile .rounded-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #dadce0;
+  object-fit: cover;
+  transition: 0.2s;
+}
+
+.profile img:hover,
+.profile .rounded-circle:hover {
+  border-color: #1a73e8;
+  transform: scale(1.04);
+}
+
+.profile .rounded-circle {
+  background: #1a73e8 !important;
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 170px;
+  box-shadow: 0 8px 24px rgba(60, 64, 67, 0.25);
+}
+
+.dropdown-item {
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #202124;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background: #f1f3f4;
+  color: #1a73e8;
+}
