@@ -1,480 +1,713 @@
-**# Lumina — Smart City Safety Mapper**
-
-A full-stack web application that allows citizens to discover, report, and track safety incidents in their city in real time. Built with React on the frontend and Spring Boot on the backend, with Ola Maps for geospatial visualization.
-
-**---**
-
-**## Tech Stack**
-
-**### Frontend**
-
-\- React 18 (Vite)
-
-\- React Router DOM
-
-\- Ola Maps Web SDK
-
-\- Bootstrap 5
-
-\- Axios
-
-\- Sonner (toast notifications)
-
-\- @react-oauth/google
-
-**### Backend**
-
-\- Spring Boot 3
-
-\- Spring Security + JWT
-
-\- Spring Data JPA
-
-\
-\- MapStruct
-
-\- Lombok
-
-\- Google API Client (ID token verification)
-
-\- MySQL
-
-**---**
-
-**## Features Implemented**
-
-**### Authentication**
-
-\- Google OAuth2 login via frontend-driven Pattern B (ID token sent to backend for verification)
-
-\- JWT issued by backend after Google token verification
-
-\- JWT stored in localStorage, attached to all requests via Axios interceptor
-
-\- Protected routes — unauthenticated users redirected to login
-
-\- Role-based access — USER and ADMIN roles enforced on both backend (@PreAuthorize) and frontend (AdminRoute)
-
-\- Automatic session restore on page refresh via localStorage
-
-\- Logout clears session and redirects to login
-
-**### Map**
-
-\- Ola Maps Web SDK integration with vector tiles
-
-\- Browser Geolocation API — map flies to user's current location on load
-
-\- Incident markers rendered as colored dots (color based on incident category)
-
-\- Custom HTML popup on marker click — shows title, category, reporter, time ago, distance, upvote button, view details link
-
-\- Category filter panel — toggle visibility of incident types
-
-\- Radius slider (1–20km) with 500ms debounce — re-fetches incidents on change
-
-\- Nearby incidents sidebar — sorted by distance, click to pan map and open popup
-
-\- Marker management via Map (keyed by incidentId) for efficient add/remove
-
-**### Incidents**
-
-\- View all incidents near user location within a configurable radius
-
-\- Haversine formula — two-step geo query (bounding box pre-filter + precise distance calculation)
-
-\- Incident detail page (/incidents/\:id) — full info, photo gallery, mini map, reporter card, upvote toggle
-
-\- Optimistic upvote — count updates instantly, reverts on failure
-
-\- userHasVoted — backend checks vote status per user on detail page load
-
-\- Report incident form — category, title, description, date/time, lat/lng, photo upload (max 3)
-
-\- "Use my current location" button auto-fills coordinates
-
-\- Photo upload via multipart/form-data — stored on filesystem, served as static resources
-
-\- Photo preview with individual remove before submit
-
-**### User Dashboard (/profile)**
-
-\- Displays user avatar (Google), name, email, role badge
-
-\- Stats cards — total reports, total upvotes received, resolved count
-
-\- "My Reports" list with status badges and time ago
-
-\- Delete own incidents (ownership-checked endpoint, ADMIN endpoint separate)
-
-\- Logout button
-
-**### Admin Panel (/admin)**
-
-\- Paginated table of all incidents (10 per page)
-
-\- Stats bar — total, active, resolved, flagged counts
-
-\- Inline status change via dropdown per row (ACTIVE / RESOLVED / FLAGGED)
-
-\- Delete incident with confirmation dialog
-
-\- Client-side search by title
-
-\- Status filter dropdown
-
-\- Pagination controls with previous/next and page numbers
-
-\- Admin-only access enforced on both frontend (AdminRoute) and backend (@PreAuthorize("hasRole('ADMIN')"))
-
-**### Navigation**
-
-\- Persistent navbar on all protected pages (absent on login)
-
-\- Active link highlighting via NavLink
-
-\- Admin link conditionally rendered for ADMIN role only
-
-\- Avatar dropdown — My Profile + Logout
-
-\- Bootstrap mobile hamburger collapse
-
-\- 404 Not Found page for unmatched routes
-
-**---**
-
-**## Project Structure**
-
-\`\`\`
-
+# Lumina — Smart City Safety Mapper
+
+> A full-stack civic safety platform that helps citizens **discover, report, and track local safety incidents** through an interactive map, authenticated user accounts, and an administration dashboard.
+
+**Frontend:** React 18 + Vite  
+**Backend:** Spring Boot 3 + Spring Security + JPA  
+**Database:** MySQL  
+**Maps:** Ola Maps Web SDK  
+**Authentication:** Google OAuth2 + JWT
+
+---
+
+## 📌 Table of Contents
+
+- [Overview](#-overview)
+- [Core Features](#-core-features)
+- [System Architecture](#-system-architecture)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Database Design](#-database-design)
+- [REST API](#-rest-api)
+- [Authentication & Authorization](#-authentication--authorization)
+- [Key Technical Decisions](#-key-technical-decisions)
+- [Environment Variables](#-environment-variables)
+- [Getting Started](#-getting-started)
+- [Development Workflow](#-development-workflow)
+- [Implementation Timeline](#-implementation-timeline)
+
+---
+
+## 🎯 Overview
+
+Lumina is designed around a simple workflow:
+
+**Locate → Discover → Report → Track → Manage**
+
+Users can:
+
+- View nearby safety incidents on an interactive map.
+- Filter incidents by category and search radius.
+- Open detailed incident information, photos, reporter details, and location.
+- Report new incidents with descriptions, coordinates, and photos.
+- Upvote incidents.
+- Manage their own reports from a personal dashboard.
+
+Administrators can additionally:
+
+- View all reported incidents.
+- Search and filter incidents.
+- Update incident status.
+- Delete incidents.
+- Monitor incident statistics.
+
+---
+
+## ✨ Core Features
+
+### 🔐 Authentication & Authorization
+
+- Google sign-in using `@react-oauth/google`.
+- Frontend receives a Google ID token and sends it to the backend.
+- Backend verifies the ID token with Google.
+- Backend creates/finds the user and issues its own JWT.
+- JWT is stored in `localStorage`.
+- Axios automatically attaches the JWT to protected requests.
+- Protected routes redirect unauthenticated users to login.
+- Role-based access for `USER` and `ADMIN`.
+- Authorization enforced at both frontend and backend levels.
+- Session restoration after page refresh.
+- Logout clears the local session.
+
+### 🗺️ Interactive Safety Map
+
+- Ola Maps Web SDK with vector tiles.
+- Browser geolocation to center the map around the user's location.
+- Incident markers displayed as colored dots.
+- Marker colors correspond to incident categories.
+- Custom marker popups containing:
+  - Incident title
+  - Category
+  - Reporter
+  - Time ago
+  - Distance
+  - Upvote action
+  - Details link
+- Category-based visibility filters.
+- Configurable radius from **1–20 km**.
+- **500 ms debounce** on radius changes.
+- Nearby-incidents sidebar sorted by distance.
+- Clicking a sidebar incident pans the map and opens its popup.
+- Marker references are keyed by `incidentId` for efficient updates.
+
+### 🚨 Incident Management
+
+- Retrieve nearby incidents using latitude, longitude, and radius.
+- Two-step geographic filtering:
+  1. SQL bounding-box pre-filter.
+  2. Precise Haversine distance calculation.
+- Incident detail page with:
+  - Complete incident information
+  - Photo gallery
+  - Mini map
+  - Reporter card
+  - Upvote status
+- Optimistic upvote updates with rollback on API failure.
+- Backend tracks whether the current user has already voted.
+- Incident reporting form with:
+  - Category
+  - Title
+  - Description
+  - Date/time
+  - Latitude/longitude
+  - Up to 3 photos
+- "Use my current location" automatically fills coordinates.
+- Multipart photo upload.
+- Local filesystem photo storage.
+- Photo preview and individual removal before submission.
+
+### 👤 User Dashboard
+
+Route: `/profile`
+
+- Google profile avatar.
+- Name, email, and role.
+- Statistics:
+  - Total reports
+  - Total upvotes received
+  - Resolved incidents
+- "My Reports" list.
+- Incident status badges.
+- Delete-own-incident functionality.
+- Separate admin deletion endpoint.
+- Logout.
+
+### 🛠️ Admin Panel
+
+Route: `/admin`
+
+- Paginated incident table.
+- 10 incidents per page.
+- Dashboard statistics:
+  - Total
+  - Active
+  - Resolved
+  - Flagged
+- Inline status updates:
+  - `ACTIVE`
+  - `RESOLVED`
+  - `FLAGGED`
+- Incident deletion with confirmation.
+- Client-side title search.
+- Status filtering.
+- Previous/next and numbered pagination.
+- Admin-only access enforced on both frontend and backend.
+
+### 🧭 Navigation & UX
+
+- Persistent navbar on protected pages.
+- Active navigation highlighting with `NavLink`.
+- Admin navigation shown only to administrators.
+- Avatar dropdown containing profile and logout actions.
+- Bootstrap responsive navigation.
+- Dedicated `404 Not Found` page.
+- Dedicated `403 Forbidden` page for unauthorized access.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+flowchart LR
+    U[Citizen / Admin] --> FE[React Frontend]
+
+    FE -->|Google ID Token| AUTH[Spring Boot Auth API]
+    AUTH -->|Verify token| GOOGLE[Google OAuth2]
+    AUTH -->|Issue JWT| FE
+
+    FE -->|JWT + REST API| API[Spring Boot REST API]
+
+    API --> SEC[Spring Security + JWT Filter]
+    SEC --> SVC[Service Layer]
+    SVC --> JPA[Spring Data JPA]
+    JPA --> DB[(MySQL)]
+
+    API --> GEO[Geospatial Query]
+    GEO --> DB
+
+    FE --> MAP[Ola Maps Web SDK]
+
+    FE -->|Multipart Upload| FILE[Server File Storage]
+    FILE --> FE
+```
+
+### High-Level Request Flow
+
+```text
+User
+  │
+  ▼
+React UI
+  │
+  ├── Google Login ───────────────► /auth/google
+  │                                  │
+  │                                  ▼
+  │                           Google ID Token Verification
+  │                                  │
+  │                                  ▼
+  │                                JWT
+  │
+  └── Protected API Requests ─────► Spring Security
+                                      │
+                                      ▼
+                                  Controller
+                                      │
+                                      ▼
+                                   Service
+                                      │
+                         ┌────────────┴────────────┐
+                         ▼                         ▼
+                    MySQL / JPA              File Storage
+```
+
+---
+
+## 🧰 Tech Stack
+
+### Frontend
+
+| Technology | Purpose |
+|---|---|
+| React 18 | UI development |
+| Vite | Frontend build tooling |
+| React Router DOM | Client-side routing |
+| Ola Maps Web SDK | Interactive map and markers |
+| Bootstrap 5 | Responsive UI and components |
+| Axios | REST API communication |
+| Sonner | Toast notifications |
+| `@react-oauth/google` | Google sign-in |
+
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| Spring Boot 3 | Backend application framework |
+| Spring Security | Authentication and authorization |
+| JWT | Stateless authentication |
+| Spring Data JPA | Persistence layer |
+| MapStruct | DTO/entity mapping |
+| Lombok | Boilerplate reduction |
+| Google API Client | Google ID-token verification |
+| MySQL | Relational database |
+
+### Supporting Components
+
+| Component | Purpose |
+|---|---|
+| Browser Geolocation API | Current user location |
+| Local filesystem | Incident photo storage |
+| Haversine formula | Precise geographic distance |
+| Multipart/form-data | Photo upload |
+
+---
+
+## 📁 Project Structure
+
+### Backend
+
+```text
 Backend/
-
 ├── controller/
-
-│   ├── AuthController.java
-
-│   ├── IncidentController.java
-
-│   ├── UserController.java
-
-│   └── AdminController.java
-
+│   ├── AuthController.java
+│   ├── IncidentController.java
+│   ├── UserController.java
+│   └── AdminController.java
+│
 ├── service/
-
-│   ├── GoogleAuthService.java
-
-│   ├── IncidentService.java
-
-│   ├── IncidentPhotoService.java
-
-│   ├── UserService.java
-
-│   ├── AdminService.java
-
-│   └── FileStorageService.java
-
+│   ├── GoogleAuthService.java
+│   ├── IncidentService.java
+│   ├── IncidentPhotoService.java
+│   ├── UserService.java
+│   ├── AdminService.java
+│   └── FileStorageService.java
+│
 ├── model/
-
-│   ├── User.java
-
-│   ├── Incident.java
-
-│   ├── IncidentCategory.java
-
-│   ├── IncidentPhoto.java
-
-│   └── IncidentVote.java
-
+│   ├── User.java
+│   ├── Incident.java
+│   ├── IncidentCategory.java
+│   ├── IncidentPhoto.java
+│   └── IncidentVote.java
+│
 ├── dto/
-
-│   ├── AuthResponseDto.java
-
-│   ├── GoogleAuthRequestDto.java
-
-│   ├── IncidentDto.java
-
-│   ├── IncidentRequestDto.java
-
-│   ├── IncidentCategoryDto.java
-
-│   ├── UserDto.java
-
-│   ├── UserSummaryDto.java
-
-│   ├── VoteResponseDto.java
-
-│   └── StatusUpdateDto.java
-
+│   ├── AuthResponseDto.java
+│   ├── GoogleAuthRequestDto.java
+│   ├── IncidentDto.java
+│   ├── IncidentRequestDto.java
+│   ├── IncidentCategoryDto.java
+│   ├── UserDto.java
+│   ├── UserSummaryDto.java
+│   ├── VoteResponseDto.java
+│   └── StatusUpdateDto.java
+│
 ├── mapper/
-
-│   ├── IncidentMapper.java
-
-│   ├── IncidentCategoryMapper.java
-
-│   └── UserMapper.java
-
+│   ├── IncidentMapper.java
+│   ├── IncidentCategoryMapper.java
+│   └── UserMapper.java
+│
 ├── repo/
-
-│   ├── UserRepo.java
-
-│   ├── IncidentRepo.java
-
-│   ├── IncidentCategoryRepo.java
-
-│   ├── IncidentPhotoRepo.java
-
-│   └── IncidentVoteRepo.java
-
+│   ├── UserRepo.java
+│   ├── IncidentRepo.java
+│   ├── IncidentCategoryRepo.java
+│   ├── IncidentPhotoRepo.java
+│   └── IncidentVoteRepo.java
+│
 ├── security/
-
-│   ├── JwtUtil.java
-
-│   ├── JwtAuthFilter.java
-
-│   ├── SecurityConfig.java
-
-│   └── GoogleAuthConfig.java
-
+│   ├── JwtUtil.java
+│   ├── JwtAuthFilter.java
+│   ├── SecurityConfig.java
+│   └── GoogleAuthConfig.java
+│
 ├── exception/
-
-│   ├── GlobalExceptionHandler.java
-
-│   ├── GoogleAuthException.java
-
-│   ├── BadCredentialsException.java
-
-│   └── IncidentNotFoundException.java
-
+│   ├── GlobalExceptionHandler.java
+│   ├── GoogleAuthException.java
+│   ├── BadCredentialsException.java
+│   └── IncidentNotFoundException.java
+│
 └── config/
+    └── WebConfig.java
+```
 
-    └── WebConfig.java
+### Frontend
 
+```text
 Frontend/
-
 ├── api/
-
-│   └── axiosInstance.js
-
+│   └── axiosInstance.js
+│
 ├── components/
-
-│   ├── LoginPage.jsx
-
-│   ├── MapPage.jsx
-
-│   ├── ReportPage.jsx
-
-│   ├── IncidentDetailPage.jsx
-
-│   ├── UserProfile.jsx
-
-│   ├── AdminPanel.jsx
-
-│   ├── Navbar.jsx
-
-│   ├── ProtectedRoute.jsx
-
-│   ├── AdminRoute.jsx
-
-│   ├── Forbidden.jsx
-
-│   ├── CategoryFilter.jsx
-
-│   ├── IncidentSidebar.jsx
-
-│   ├── RadiusSlider.jsx
-
-│   ├── PhotoGallery.jsx
-
-│   ├── ReporterCard.jsx
-
-│   └── MiniMap.jsx
-
+│   ├── LoginPage.jsx
+│   ├── MapPage.jsx
+│   ├── ReportPage.jsx
+│   ├── IncidentDetailPage.jsx
+│   ├── UserProfile.jsx
+│   ├── AdminPanel.jsx
+│   ├── Navbar.jsx
+│   ├── ProtectedRoute.jsx
+│   ├── AdminRoute.jsx
+│   ├── Forbidden.jsx
+│   ├── CategoryFilter.jsx
+│   ├── IncidentSidebar.jsx
+│   ├── RadiusSlider.jsx
+│   ├── PhotoGallery.jsx
+│   ├── ReporterCard.jsx
+│   └── MiniMap.jsx
+│
 ├── contexts/
-
-│   ├── AuthProvider.jsx
-
-│   └── CategoriesProvider.jsx
-
+│   ├── AuthProvider.jsx
+│   └── CategoriesProvider.jsx
+│
 └── utils/
+    ├── timeAgo.js
+    ├── buildIncidentPopup.js
+    ├── getStatusBadge.js
+    └── getPhotoThumbnails.js
+```
+
+---
+
+## 🗄️ Database Design
+
+### Entity Relationship Overview
+
+```mermaid
+erDiagram
+    USERS ||--o{ INCIDENTS : reports
+    USERS ||--o{ INCIDENT_VOTES : casts
+    INCIDENT_CATEGORIES ||--o{ INCIDENTS : categorizes
+    INCIDENTS ||--o{ INCIDENT_PHOTOS : contains
+    INCIDENTS ||--o{ INCIDENT_VOTES : receives
+
+    USERS {
+        BIGINT user_id PK
+        VARCHAR google_id UK
+        VARCHAR email UK
+        VARCHAR name
+        VARCHAR avatar_url
+        ENUM role
+        DATETIME created_at
+    }
+
+    INCIDENT_CATEGORIES {
+        INT category_id PK
+        VARCHAR name
+        VARCHAR icon_name
+        VARCHAR color_hex
+    }
+
+    INCIDENTS {
+        BIGINT incident_id PK
+        BIGINT user_id FK
+        INT category_id FK
+        VARCHAR title
+        TEXT description
+        DECIMAL lat
+        DECIMAL lng
+        ENUM status
+        INT upvote_count
+        DATETIME occurred_at
+        DATETIME created_at
+    }
+
+    INCIDENT_PHOTOS {
+        BIGINT id PK
+        BIGINT incident_id FK
+        VARCHAR url
+        DATETIME uploaded_at
+    }
+
+    INCIDENT_VOTES {
+        BIGINT id PK
+        BIGINT incident_id FK
+        BIGINT user_id FK
+        DATETIME voted_at
+    }
+```
+
+### `users`
+
+| Column | Type | Notes |
+|---|---|---|
+| `user_id` | BIGINT PK | Auto-generated |
+| `google_id` | VARCHAR | Unique Google `sub` claim |
+| `email` | VARCHAR | Unique |
+| `name` | VARCHAR | User name |
+| `avatar_url` | VARCHAR | Google profile picture |
+| `role` | ENUM | `USER`, `ADMIN` |
+| `created_at` | DATETIME | Account creation time |
+
+### `incident_categories`
+
+| Column | Type | Notes |
+|---|---|---|
+| `category_id` | INT PK | Auto-generated |
+| `name` | VARCHAR | Example: Fire, Road Hazard |
+| `icon_name` | VARCHAR | Material symbol or emoji |
+| `color_hex` | VARCHAR | Marker color |
+
+### `incidents`
+
+| Column | Type | Notes |
+|---|---|---|
+| `incident_id` | BIGINT PK | Auto-generated |
+| `user_id` | BIGINT FK | References `users` |
+| `category_id` | INT FK | References `incident_categories` |
+| `title` | VARCHAR | Incident title |
+| `description` | TEXT | Incident details |
+| `lat` | DECIMAL(10,7) | Latitude |
+| `lng` | DECIMAL(10,7) | Longitude |
+| `status` | ENUM | `ACTIVE`, `RESOLVED`, `FLAGGED` |
+| `upvote_count` | INT | Defaults to 0 |
+| `occurred_at` | DATETIME | Incident occurrence |
+| `created_at` | DATETIME | Record creation |
+
+### `incident_photos`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | BIGINT PK | Auto-generated |
+| `incident_id` | BIGINT FK | References `incidents` |
+| `url` | VARCHAR | Relative upload path |
+| `uploaded_at` | DATETIME | Upload time |
+
+### `incident_votes`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | BIGINT PK | Auto-generated |
+| `incident_id` | BIGINT FK | References `incidents` |
+| `user_id` | BIGINT FK | References `users` |
+| `voted_at` | DATETIME | Vote time |
+
+> **Constraint:** `(incident_id, user_id)` is unique, preventing duplicate votes by the same user on the same incident.
+
+---
+
+## 🌐 REST API
+
+### Authentication
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/auth/google` | Public | Verify Google ID token and issue JWT |
 
-    ├── timeAgo.js
+### Incidents
 
-    ├── buildIncidentPopup.js
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/incidents` | User | Fetch nearby incidents |
+| `GET` | `/api/incidents/{id}` | User | Fetch incident details |
+| `GET` | `/api/incidents/categories` | User | Fetch incident categories |
+| `POST` | `/api/incidents` | User | Report an incident |
+| `POST` | `/api/incidents/{id}/photos` | User | Upload photos |
+| `PUT` | `/api/incidents/{id}/vote` | User | Toggle upvote |
+| `PUT` | `/api/incidents/{id}/status` | Admin | Change incident status |
+| `DELETE` | `/api/incidents/{id}` | Admin | Delete an incident |
 
-    ├── getStatusBadge.js
+### Users
 
-    └── getPhotoThumbnails.js
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/users/me` | User | Fetch current profile |
+| `GET` | `/api/users/me/incidents` | User | Fetch current user's incidents |
+| `DELETE` | `/api/users/me/incidents/{id}` | User | Delete own incident |
 
-\`\`\`
+### Admin
 
-**---**
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/admin/incidents` | Admin | Fetch paginated incidents |
+| `GET` | `/api/admin/stats` | Admin | Fetch counts by status |
 
-**## Database Schema**
+---
 
-**### users**
+## 🔐 Authentication & Authorization
 
-\| Column | Type | Notes |
+Lumina uses **two authentication steps**:
 
-\|---|---|---|
+```text
+Google Sign-In
+     │
+     ▼
+Google ID Token
+     │
+     ▼
+POST /auth/google
+     │
+     ▼
+Backend verifies token with Google
+     │
+     ├── Find existing user
+     └── Create user if needed
+     │
+     ▼
+Backend issues JWT
+     │
+     ▼
+Frontend stores JWT
+     │
+     ▼
+Axios interceptor attaches JWT
+     │
+     ▼
+JwtAuthFilter validates token
+     │
+     ▼
+Spring Security sets authenticated principal
+```
 
-\| user_id | BIGINT PK | Auto-generated |
+### Role-Based Access
 
-\| google_id | VARCHAR | Unique, from Google sub claim |
+Two application roles are supported:
 
-\| email | VARCHAR | Unique |
+- `USER`
+- `ADMIN`
 
-\| name | VARCHAR | |
+Authorization is enforced at two levels:
 
-\| avatar_url | VARCHAR | Google profile picture URL |
+**Frontend**
+- `ProtectedRoute`
+- `AdminRoute`
 
-\| role | ENUM | USER, ADMIN |
+**Backend**
+- Spring Security configuration
+- `@PreAuthorize("hasRole('ADMIN')")`
 
-\| created_at | DATETIME | |
+---
 
-**### incident_categories**
+## 🧠 Key Technical Decisions
 
-\| Column | Type | Notes |
+### 1. Google OAuth2 — Frontend-Driven Pattern
 
-\|---|---|---|
+React handles the Google sign-in popup and receives the Google ID token.
 
-\| category_id | INT PK | Auto-generated |
+The token is sent to:
 
-\| name | VARCHAR | Fire, Road Hazard, etc. |
+```text
+POST /auth/google
+```
 
-\| icon_name | VARCHAR | Material symbol or emoji |
+The backend verifies it with `GoogleIdTokenVerifier`, finds or creates the user, and issues Lumina's own JWT.
 
-\| color_hex | VARCHAR | Hex color for map marker |
+After authentication, Google is not involved in normal application API requests.
 
-**### incidents**
+### 2. JWT — Stateless Authentication
 
-\| Column | Type | Notes |
+Lumina does not maintain server-side sessions.
 
-\|---|---|---|
+The JWT contains:
 
-\| incident_id | BIGINT PK | Auto-generated |
+- Email
+- User ID
+- Role
 
-\| user_id | BIGINT FK | References users |
+`JwtAuthFilter` validates the token on protected requests and sets the authenticated principal in Spring Security.
 
-\| category_id | INT FK | References incident_categories |
+This allows the application to authenticate requests without a server-side session lookup.
 
-\| title | VARCHAR | |
+### 3. Haversine-Based Nearby Incident Search
 
-\| description | TEXT | |
+Nearby incidents are retrieved using a two-stage strategy:
 
-\| lat | DECIMAL(10,7) | |
+```text
+User Location
+     │
+     ▼
+SQL Bounding Box
+     │
+     │  Cheap first-stage filtering
+     ▼
+Candidate Incidents
+     │
+     ▼
+Haversine Distance
+     │
+     │  Precise distance calculation
+     ▼
+Sorted Nearby Results
+```
 
-\| lng | DECIMAL(10,7) | |
+The bounding box reduces the number of rows that require precise distance calculations.
 
-\| status | ENUM | ACTIVE, RESOLVED, FLAGGED |
+The returned `distanceKm` value is then exposed to the frontend through `IncidentDto`.
 
-\| upvote_count | INT | Default 0 |
+### 4. MapStruct for DTO Mapping
 
-\| occurred_at | DATETIME | |
+MapStruct generates mapper implementations at compile time.
 
-\| created_at | DATETIME | |
+It handles:
 
-**### incident_photos**
+- Entity → DTO conversion
+- Nested user/category mapping
+- Photo URL extraction
 
-\| Column | Type | Notes |
+Fields such as:
 
-\|---|---|---|
+- `distanceKm`
+- `userHasVoted`
 
-\| id | BIGINT PK | |
+are populated later in the service layer because they depend on runtime calculations or additional data.
 
-\| incident_id | BIGINT FK | References incidents |
+### 5. Protected `CategoriesProvider`
 
-\| url | VARCHAR | Relative path e.g. /uploads/abc.jpg |
+`CategoriesProvider` is mounted inside the protected application layout.
 
-\| uploaded_at | DATETIME | |
+This prevents the categories request from firing on the login page before a JWT exists.
 
-**### incident_votes**
+Previously, loading the provider globally caused:
 
-\| Column | Type | Notes |
+```text
+Login Page
+   ↓
+GET /api/incidents/categories
+   ↓
+401 Unauthorized
+   ↓
+Axios interceptor redirects to /login
+   ↓
+Login page reload loop
+```
 
-\|---|---|---|
+Moving the provider into the protected layout ensures the API call occurs only after authentication is established.
 
-\| id | BIGINT PK | |
+### 6. Optimistic Upvotes
 
-\| incident_id | BIGINT FK | References incidents |
+When a user clicks upvote:
 
-\| user_id | BIGINT FK | References users |
+```text
+Click
+  ↓
+Update UI immediately
+  ↓
+Send API request
+  ├── Success → keep server response
+  └── Failure → restore previous state + show error
+```
 
-\| voted_at | DATETIME | |
+This makes the interaction feel immediate while still preserving consistency when the request fails.
 
-\| | | Unique constraint on (incident_id, user_id) |
+### 7. Local Filesystem Photo Storage
 
-**---**
+Uploaded photos are stored in the server's `uploads/` directory.
 
-**## REST API Endpoints**
+Files use UUID-prefixed names to reduce:
 
-**### Auth**
+- Filename collisions
+- Unsafe path manipulation
 
-\| Method | Path | Auth | Description |
+Spring exposes `/uploads/**` as static resources so uploaded photos can be displayed by the frontend.
 
-\|---|---|---|---|
+---
 
-\| POST | /auth/google | Public | Verify Google ID token, return JWT |
+## ⚙️ Environment Variables
 
-**### Incidents**
+### Backend — `application.properties`
 
-\| Method | Path | Auth | Description |
-
-\|---|---|---|---|
-
-\| GET | /api/incidents | User | Fetch nearby incidents (lat, lng, radiusKm) |
-
-\| GET | /api/incidents/{id} | User | Fetch incident detail |
-
-\| GET | /api/incidents/categories | User | Fetch all categories |
-
-\| POST | /api/incidents | User | Report new incident |
-
-\| POST | /api/incidents/{id}/photos | User | Upload photos (multipart) |
-
-\| PUT | /api/incidents/{id}/vote | User | Toggle upvote |
-
-\| PUT | /api/incidents/{id}/status | Admin | Change incident status |
-
-\| DELETE | /api/incidents/{id} | Admin | Delete incident |
-
-**### Users**
-
-\| Method | Path | Auth | Description |
-
-\|---|---|---|---|
-
-\| GET | /api/users/me | User | Get current user profile |
-
-\| GET | /api/users/me/incidents | User | Get current user's incidents |
-
-\| DELETE | /api/users/me/incidents/{id} | User | Delete own incident |
-
-**### Admin**
-
-\| Method | Path | Auth | Description |
-
-\|---|---|---|---|
-
-\| GET | /api/admin/incidents | Admin | Paginated all incidents |
-
-\| GET | /api/admin/stats | Admin | Incident counts by status |
-
-**---**
-
-**## Environment Variables**
-
-**### Backend — application.properties**
-
-\`\`\`properties
-
-spring.datasource.url=jdbc\:mysql://localhost:3306/lumina_db
-
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/lumina_db
 spring.datasource.username=your_username
-
 spring.datasource.password=your_password
 
 jwt.secret=your_base64_encoded_secret_min_32_chars
-
 jwt.expiration=3600000
 
 google.client.id=your_google_client_id.apps.googleusercontent.com
@@ -482,165 +715,210 @@ google.client.id=your_google_client_id.apps.googleusercontent.com
 file.upload-dir=uploads
 
 spring.servlet.multipart.max-file-size=5MB
-
 spring.servlet.multipart.max-request-size=20MB
+```
 
-\`\`\`
+### Frontend — `.env`
 
-**### Frontend — .env**
-
-\`\`\`
-
+```env
 VITE_OLA_MAPS_API_KEY=your_ola_maps_api_key
-
 VITE_GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
+VITE_API_BASE_URL=http://localhost:8080
+```
 
-VITE_API_BASE_URL=http\://localhost:8080
+> Keep secrets and API credentials out of source control. Add the relevant environment files to `.gitignore`.
 
-\`\`\`
+---
 
-**---**
+## 🚀 Getting Started
 
-**## Setup Instructions**
+### Prerequisites
 
-**### Prerequisites**
+Make sure the following are installed:
 
-\- Java 21
+- **Java 21**
+- **Node.js 18+**
+- **MySQL 8+**
+- **Maven**
 
-\- Node.js 18+
+### 1. Clone the Repository
 
-\- MySQL 8+
+```bash
+git clone <repository-url>
+cd <project-directory>
+```
 
-\- Maven
+### 2. Create the Database
 
-**### Backend**
-
-\`\`\`bash
-
-\# 1. Create MySQL database
-
+```sql
 CREATE DATABASE lumina_db;
+```
 
-\# 2. Configure application.properties with your DB credentials and keys
+### 3. Configure the Backend
 
-\# 3. Run the application
+Update `application.properties` with:
 
-./mvnw spring-boot\:run
+- MySQL credentials
+- JWT secret
+- Google client ID
+- Upload directory
+- Multipart limits
 
-\`\`\`
+### 4. Start the Backend
 
-**### Frontend**
+```bash
+./mvnw spring-boot:run
+```
 
-\`\`\`bash
+### 5. Configure the Frontend
 
-\# 1. Install dependencies
+Create a `.env` file and add:
 
+```env
+VITE_OLA_MAPS_API_KEY=your_ola_maps_api_key
+VITE_GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+### 6. Install Dependencies
+
+```bash
 npm install
+```
 
-\# 2. Create .env file with required variables
+### 7. Start the Frontend
 
-\# 3. Start development server
-
+```bash
 npm run dev
+```
 
-\`\`\`
+### 8. Open the Application
 
-**### First Run**
+```text
+http://localhost:5173
+```
 
-1\. Open http\://localhost:5173
+---
 
-2\. Sign in with your Google account
+## 🧪 First Run
 
-3\. Allow location access when prompted
+1. Open the application.
+2. Sign in with your Google account.
+3. Allow browser location access.
+4. To promote a user to `ADMIN`, run:
 
-4\. To promote yourself to admin, run this SQL:
+```sql
+UPDATE users
+SET role = 'ADMIN'
+WHERE email = 'your@email.com';
+```
 
-\`\`\`sql
+5. Log out and sign in again so the updated role is reflected in the new JWT.
 
-UPDATE users SET role = 'ADMIN' WHERE email = 'your\@email.com';
+---
 
-\`\`\`
+## 🗺️ Application Workflow
 
-5\. Log out and log back in for the new role to take effect
+```mermaid
+flowchart TD
+    A[Open Lumina] --> B{Authenticated?}
 
-**---**
+    B -- No --> C[Google Login]
+    C --> D[Verify Google ID Token]
+    D --> E[Issue JWT]
+    E --> F[Protected Application]
 
-**## Key Architecture Decisions**
+    B -- Yes --> F
 
-**\*\*Google OAuth2 — Pattern B (Frontend-driven)\*\***
+    F --> G[Load User Location]
+    G --> H[Fetch Nearby Incidents]
+    H --> I[Bounding Box Filter]
+    I --> J[Haversine Distance]
+    J --> K[Display Map + Sidebar]
 
-React handles the Google sign-in popup via @react-oauth/google. The resulting ID token is sent to the backend POST /auth/google. The backend verifies the token with Google using GoogleIdTokenVerifier, finds or creates the user in the database, and issues its own JWT. Google is not involved in any subsequent API requests.
+    K --> L{User Action}
 
-**\*\*JWT — Stateless authentication\*\***
+    L --> M[View Incident]
+    L --> N[Upvote Incident]
+    L --> O[Report Incident]
+    L --> P[Open Profile]
 
-No server-side sessions. The JWT contains email, userId, and role as claims. JwtAuthFilter validates every protected request by parsing the token — no database call needed per request. The SecurityContext principal is set to the user's email, accessible via SecurityContextHolder in any controller or service.
+    O --> Q[Submit Incident]
+    Q --> R[Upload Photos]
+    R --> S[Store Incident + Photos]
 
-**\*\*Haversine geo query\*\***
+    P --> T{Admin?}
+    T -- Yes --> U[Admin Panel]
+    T -- No --> V[User Dashboard]
 
-Two-step approach: SQL bounding box pre-filter (cheap, uses indexes) followed by precise Haversine distance calculation in the same native query. Results are ordered by distance ascending. Java-side distance recalculation provides the distanceKm field on each IncidentDto returned to the frontend.
+    U --> W[Search / Filter / Update / Delete]
+```
 
-**\*\*MapStruct for DTO mapping\*\***
+---
 
-Compile-time annotation processor generates mapper implementations. IncidentMapper handles nested objects (User to UserSummaryDto, IncidentCategory to CategoryDto) and custom field extraction (List of IncidentPhoto to List of String for photo URLs). distanceKm and userHasVoted are set manually in the service layer after mapping since they require additional logic or database calls that MapStruct cannot perform.
+## 📅 Implementation Timeline
 
-**\*\*CategoriesProvider scoped inside ProtectedLayout\*\***
+| Day | Milestone |
+|---:|---|
+| 1 | Project scaffolding — Spring Boot, React, MySQL |
+| 2 | Database schema — 5 core tables |
+| 3 | JPA entities and repositories |
+| 4 | Haversine query, DTOs, MapStruct |
+| 5 | Spring Security, JWT filter, security configuration |
+| 6 | Google OAuth2 and Ola Maps setup |
+| 7 | `/auth/google`, GoogleAuthService, exception handling |
+| 8 | React authentication, login page, Axios interceptor |
+| 9 | Protected routes and user profile |
+| 10 | Role-based authorization and admin routing |
+| 11 | Incident read APIs |
+| 12 | Incident write APIs |
+| 13 | Photo upload and file serving |
+| 14 | Map integration and geolocation |
+| 15 | Incident popups and map interactions |
+| 16 | Filters, radius slider, sidebar, marker management |
+| 17 | Incident report form and photo preview |
+| 18 | Incident detail page and optimistic voting |
+| 19 | User dashboard |
+| 20 | Admin panel |
+| 21 | Navbar, routing cleanup, protected layout, 404 page |
 
-Initially placed app-wide, causing GET /api/incidents/categories to fire on the login page (no JWT present) returning 401, which the Axios interceptor handled by redirecting to /login, causing an infinite refresh loop. Fixed by moving CategoriesProvider inside ProtectedLayout so it only mounts after authentication is confirmed by ProtectedRoute.
+---
 
-**\*\*Optimistic upvote updates\*\***
+## 📌 Project Summary
 
-Vote count and userHasVoted state update instantly on click before the API call completes. Pre-click values are saved as local variables. On API success, response values overwrite the optimistic values. On failure, the saved pre-click values are restored and a toast error is shown.
+| Area | Implementation |
+|---|---|
+| Frontend | React 18 + Vite |
+| Backend | Spring Boot 3 |
+| Authentication | Google OAuth2 + JWT |
+| Authorization | `USER` / `ADMIN` |
+| Database | MySQL |
+| Persistence | Spring Data JPA |
+| DTO Mapping | MapStruct |
+| Map | Ola Maps Web SDK |
+| Geolocation | Browser Geolocation API |
+| Nearby Search | Bounding Box + Haversine |
+| Photo Storage | Local filesystem |
+| Toast | Sonner |
+| Routing | React Router DOM |
 
-**\*\*File storage — local filesystem\*\***
+---
 
-Uploaded photos are saved to an uploads/ directory on the server filesystem with UUID-prefixed filenames (preventing path traversal and name collisions). Spring serves them as static resources via WebMvcConfigurer mapping /uploads/\*\* to the filesystem location. The Security config permits all requests to /uploads/\*\* without authentication so photos are publicly viewable.
+## 🔭 Current Scope
 
-**---**
+The current implementation covers:
 
-**## Days Completed**
+- Authentication
+- Role-based authorization
+- Interactive incident map
+- Geolocation
+- Nearby incident search
+- Incident reporting
+- Photo uploads
+- Upvoting
+- User dashboard
+- Admin dashboard
+- Incident status management
+- REST APIs
+- MySQL persistence
 
-\| Day | Task |
-
-\|---|---|
-
-\| 1 | Project scaffolding — Spring Boot + React + MySQL setup |
-
-\| 2 | Database schema — all 5 tables |
-
-\| 3 | JPA entities and repositories |
-
-\| 4 | Haversine geo query, DTOs, MapStruct mappers |
-
-\| 5 | Spring Security, JWT filter, SecurityConfig |
-
-\| 6 | Google OAuth2 setup, Ola Maps SDK setup |
-
-\| 7 | /auth/google endpoint, GoogleAuthService, GlobalExceptionHandler |
-
-\| 8 | React auth integration — AuthContext, LoginPage, Axios interceptor |
-
-\| 9 | Protected routes, UserProfile, GET /api/users/me |
-
-\| 10 | Role-based access, AdminRoute, ForbiddenPage, @PreAuthorize |
-
-\| 11 | Incidents read API — nearby, detail, categories |
-
-\| 12 | Incidents write API — create, vote toggle, status update, delete |
-
-\| 13 | Photo upload API — FileStorageService, multipart endpoint, static serving |
-
-\| 14 | Map foundation — Ola Maps integration, geolocation, incident markers |
-
-\| 15 | Full popup cards — buildIncidentPopup, timeAgo, photo thumbnails, vote from popup |
-
-\| 16 | Filter panel, radius slider with debounce, incidents sidebar, marker Map refactor |
-
-\| 17 | Report incident form — validation, photo preview, two-step API submit |
-
-\| 18 | Incident detail page — gallery, mini map, optimistic upvote, userHasVoted |
-
-\| 19 | User dashboard — stats, My Reports, delete own incidents |
-
-\| 20 | Admin panel — paginated table, inline status change, stats bar, search, pagination |
-
-\| 21 | Navbar, routing cleanup, ProtectedLayout, 404 page |
