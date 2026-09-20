@@ -1,16 +1,17 @@
+import "../stylesheets/radiusSlider.css";
+
 export default function RadiusSlider({ value, onChange }) {
-
-
   return (
-    <div className="mb-3">
-      <label htmlFor="radiusSlider" className="form-label fw-semibold">
-        Radius: {value} km
-      </label>
+    <div className="radius-section">
+      <div className="radius-header">
+        <span>Search radius</span>
+        <strong>{value} km</strong>
+      </div>
 
       <input
         id="radiusSlider"
         type="range"
-        className="form-range"
+        className="radius-slider"
         min="1"
         max="20"
         step="1"

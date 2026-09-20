@@ -1,75 +1,126 @@
-.maplibregl-popup-content {
-    padding: 0 !important;
-    background: transparent !important;
-    border-radius: 16px;
-    box-shadow: none !important;
-    border: none !important;
-    overflow: hidden;
-}
-
-.maplibregl-popup-tip {
-    border-top-color: white !important; 
-}
-
-.maplibregl-popup {
-    max-width: 360px !important;
-}
-
-.maplibregl-popup-close-button {
-   top: 0;
-  right: 0;
-  width: 24px;
-  height: 24px;
-  font-size: 18px;
-  line-height: 24px;
-  padding: 0;
-}
-
-.incident-popup {
-    width: 320px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.18);
-    overflow: hidden;
-}
+/* =========================
+   MAP PAGE
+========================= */
 
 .map-container {
-    display: flex;
-    height: calc(100vh - 60px);
-    width: 100%;
-}
-
-.loading-box {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    z-index: 1000;
-    background: #fff;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.filter-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    width: 180px;
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 64px);
+  overflow: hidden;
 }
 
 .map {
-    flex: 4;
-    height: 100%;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
 }
 
 .right-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    border-left: 1px solid #e5e5e5;
-    background: #fff;
+  width: 350px;
+  flex: 0 0 350px;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  border-left: 1px solid #e1e4e8;
+  box-shadow: -4px 0 14px rgba(32, 33, 36, 0.08);
+}
+
+/* =========================
+   RADIUS / TOP CONTROLS
+========================= */
+
+.radius-section {
+  padding: 16px 18px;
+  border-bottom: 1px solid #eceff1;
+}
+
+/* =========================
+   FILTER CONTAINER
+========================= */
+
+.filter-container {
+  position: absolute;
+  top: 16px;
+  right: 366px;
+  z-index: 1000;
+  width: 240px;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading-box {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 9px 14px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+/* =========================
+   MAP POPUP
+========================= */
+
+.maplibregl-popup-content {
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 16px;
+  box-shadow: none !important;
+  border: none !important;
+  overflow: hidden;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: #ffffff !important;
+}
+
+.maplibregl-popup {
+  max-width: 360px !important;
+}
+
+.maplibregl-popup-close-button {
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #444;
+  font-size: 18px;
+  line-height: 28px;
+  padding: 0;
+  z-index: 10;
+}
+
+.maplibregl-popup-close-button:hover {
+  background: #f1f3f4;
+  color: #111;
+}
+
+/* =========================
+   INCIDENT POPUP
+========================= */
+
+.incident-popup {
+  width: 320px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
 }

@@ -14,11 +14,11 @@ export default function NotFoundPage() {
         </p>
 
         <button
-  onClick={() => navigate("/")}
-  className="rounded-full border-2 border-blue-600 bg-white px-7 py-3 text-sm font-medium text-black shadow-sm transition-all duration-200 hover:bg-blue-50 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
->
-  Go back to map
-</button>
+          onClick={() => navigate("/")}
+          className="rounded-full border-2 border-blue-600 bg-white px-7 py-3 text-sm font-medium text-black shadow-sm transition-all duration-200 hover:bg-blue-50 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Go back to map
+        </button>
       </div>
     </div>
   );

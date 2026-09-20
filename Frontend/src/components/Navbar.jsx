@@ -1,5 +1,5 @@
 import { useAuth } from "../contexts/AuthProvider";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "../stylesheets/navbar.css"
 
